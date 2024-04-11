@@ -1,6 +1,9 @@
 ﻿#include "CPulse.h"
 #include <fstream>
+#include <filesystem>
 #include <iostream>
+
+namespace fs = std::filesystem;
 
 void CPulse::processFile(const std::string& filePath) {
     std::ifstream file(filePath);
@@ -9,31 +12,30 @@ void CPulse::processFile(const std::string& filePath) {
         return;
     }
 
-    std::string line;
-    size_t lineNumber = 0;
-    while (std::getline(file, line)) {
-        ++lineNumber;
-        try {
-            Lexer lexer(line);
-            auto tokens = lexer.tokenize();
+    // Read the entire contents of the file into a string
+    std::ostringstream sstr;
+    sstr << file.rdbuf();
+    std::string content = sstr.str();
 
-            std::cout << "Line " << lineNumber << " tokens:" << std::endl;
-            for (const auto& token : tokens) {
-                // Output each token; adjust as needed based on how you want to display them
-                std::cout << "  " << token.value << " (" << static_cast<int>(token.type) << ")" << std::endl;
-            }
-        }
-        catch (const std::runtime_error& e) {
-            std::cerr << "Error processing line " << lineNumber << ": " << e.what() << std::endl;
-        }
+    try {
+        Lexer lexer(content);  // Initialize the lexer with the entire content
+        auto tokens = lexer.tokenize(); // Tokenize the entire content
+
+        Parser parser(tokens); // Initialize the parser with the tokens
+        parser.parseProgram(); // Parse the program
+
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 
     file.close();
 }
 
 int main() {
+
     CPulse cpulse;
-    cpulse.processFile("path/to/your/input.txt");
+    cpulse.processFile("no errors.txt");
 
     return 0;
 }

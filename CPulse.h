@@ -3,6 +3,7 @@
 
 #include <string>
 #include "classes/Lexer.h"
+#include "classes/Parser.h"
 
 class CPulse {
 public:

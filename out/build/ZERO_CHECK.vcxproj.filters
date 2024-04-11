@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\out\build\CMakeFiles\469ad2317b60b17c3c8e8ca26da7a2a5\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{100BE654-6A32-3D53-9054-E9DE5DFC6863}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

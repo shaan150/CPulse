@@ -1,0 +1,10 @@
+^C:\USERS\SYSPROG\ONEDRIVE - UNIVERSITY OF DERBY\YEAR 3\LANGUAGE DESIGN\ASSIGNMENT 2\CPULSE\CPULSE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/sysprog/OneDrive - University of Derby/Year 3/Language Design/Assignment 2/CPulse/CPulse" "-BC:/Users/sysprog/OneDrive - University of Derby/Year 3/Language Design/Assignment 2/CPulse/CPulse/out/build" --check-stamp-file "C:/Users/sysprog/OneDrive - University of Derby/Year 3/Language Design/Assignment 2/CPulse/CPulse/out/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

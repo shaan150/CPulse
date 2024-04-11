@@ -1,0 +1,20 @@
+﻿{
+  "configurations": [
+    {
+      "name": "Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "clang_cl_x64" ],
+      "buildRoot": "C:/Users/sysprog/OneDrive - University of Derby/Year 3/Language Design/Assignment 2/CPulse/CPulse/out/build/Debug",
+      "installRoot": "${projectDir}/out/install/${name}",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "CMAKE_CXX_STANDARD",
+          "value": "23",
+          "type": "STRING"
+        }
+      ]
+    }
+  ]
+}

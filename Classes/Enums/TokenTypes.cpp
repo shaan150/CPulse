@@ -1,4 +1,4 @@
-#include "TokenType.h"
+#include "TokenTypes.h"
 
 std::string tokenTypeToString(TokenType type)
 {
@@ -10,6 +10,8 @@ std::string tokenTypeToString(TokenType type)
         case TokenType::DIVIDE: return "DIVIDE";
         case TokenType::LPAREN: return "LPAREN";
         case TokenType::RPAREN: return "RPAREN";
+        case TokenType::EOL: return "EOL";
+        case TokenType::EOFI: return "EOFI";
     default: return "UNKNOWN";
     }
 }

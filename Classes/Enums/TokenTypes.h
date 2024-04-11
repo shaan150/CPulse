@@ -11,6 +11,8 @@ enum class TokenType {
     DIVIDE,
     LPAREN,
     RPAREN,
+    EOL,
+    EOFI,
 };
 
 // Optional: Function to convert TokenType to a readable string

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\CPulse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\Classes\Lexer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\CPulse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\Classes\Lexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\Classes\Enums\TokenTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\Classes\Structs\Token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\sysprog\OneDrive - University of Derby\Year 3\Language Design\Assignment 2\CPulse\CPulse\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{2DD23F52-C1B4-3F33-BF5F-55E647814965}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{A8C3D2A4-0EC9-342E-9953-1D26A4D9CBAC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
