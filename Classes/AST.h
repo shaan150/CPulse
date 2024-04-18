@@ -1,38 +1,54 @@
-// AST.h
 #pragma once
+
 #include <memory>
 #include <string>
+#include <vector>
 
-// Base class for all AST nodes
+// Base class for all AST nodes.
 class ASTNode {
 public:
-    virtual ~ASTNode() = default;
+    virtual ~ASTNode() = default;  // Ensure proper cleanup with a virtual destructor.
 };
 
-// Base class for expression nodes
+// Expression node base class for all kinds of expressions.
 class ExprNode : public ASTNode {
+public:
+    virtual ~ExprNode() = default;
 };
 
+// Represents a binary operation (e.g., addition, multiplication).
 class BinaryExprNode : public ExprNode {
 public:
-    std::unique_ptr<ExprNode> left;
-    std::unique_ptr<ExprNode> right;
-    char op; // Operator as char for simplicity
+    std::unique_ptr<ExprNode> left;  // The left operand
+    std::unique_ptr<ExprNode> right; // The right operand
+    std::string op;                  // The operator
 
-    BinaryExprNode(std::unique_ptr<ExprNode> left, char op, std::unique_ptr<ExprNode> right);
+    BinaryExprNode(std::unique_ptr<ExprNode> left, std::string op, std::unique_ptr<ExprNode> right)
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
 };
 
+// Represents a unary operation (e.g., negation).
 class UnaryExprNode : public ExprNode {
 public:
-    char op; // Operator as char for simplicity
-    std::unique_ptr<ExprNode> operand;
+    std::unique_ptr<ExprNode> operand; // The operand
+    std::string op;                           // The operator
 
-    UnaryExprNode(char op, std::unique_ptr<ExprNode> operand);
+    UnaryExprNode(std::string op, std::unique_ptr<ExprNode> operand)
+        : operand(std::move(operand)), op(op) {}
 };
 
+// Represents numeric literals (e.g., "123", "3.14").
 class NumberNode : public ExprNode {
 public:
-    double value;
+    double value; // The numeric value
 
-    NumberNode(double value);
+    explicit NumberNode(double value) : value(value) {}
+};
+
+// Represents boolean literals (e.g., "true", "false").
+class BooleanNode : public ExprNode {
+public:
+    bool value; // The boolean value
+
+    explicit BooleanNode(bool value) : value(value) {}
 };

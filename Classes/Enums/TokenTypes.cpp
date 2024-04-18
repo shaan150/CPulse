@@ -10,6 +10,17 @@ std::string tokenTypeToString(TokenType type)
         case TokenType::DIVIDE: return "DIVIDE";
         case TokenType::LPAREN: return "LPAREN";
         case TokenType::RPAREN: return "RPAREN";
+        case TokenType::TRUE: return "TRUE";
+        case TokenType::FALSE: return "FALSE";
+        case TokenType::EQUAL_TO: return "EQUAL_TO";
+        case TokenType::NOT_EQUAL: return "NOT_EQUAL";
+        case TokenType::LESS_THAN: return "LESS_THAN";
+        case TokenType::GREATER_THAN: return "GREATER_THAN";
+        case TokenType::LESS_EQUAL: return "LESS_EQUAL";
+        case TokenType::GREATER_EQUAL: return "GREATER_EQUAL";
+        case TokenType::LOGICAL_AND: return "LOGICAL_AND";
+        case TokenType::LOGICAL_OR: return "LOGICAL_OR";
+        case TokenType::NOT: return "NOT";
         case TokenType::EOL: return "EOL";
         case TokenType::EOFI: return "EOFI";
     default: return "UNKNOWN";

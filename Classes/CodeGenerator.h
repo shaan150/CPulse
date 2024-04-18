@@ -1,25 +1,19 @@
+#pragma once
 #include "AST.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Module.h"
-#include "llvm/IR/IRBuilder.h"
+#include "TokenTypes.h"
+#include <memory>
+#include <iostream>
 
 class CodeGenerator {
 public:
-    CodeGenerator();
-
-    // Takes the root of the AST and generates code
-    void generateCode(const ExprNode* root);
+    // Executes the AST and outputs the result
+    void execute(const ExprNode* root);
 
 private:
-    llvm::LLVMContext context;
-    std::unique_ptr<llvm::Module> module;
-    llvm::IRBuilder<> builder;
-
-    // Methods to handle different node types
-    llvm::Value* generate(const ExprNode* node);
-    llvm::Value* generate(const NumberNode* node);
-    llvm::Value* generate(const BinaryExprNode* node);
-    llvm::Value* generate(const UnaryExprNode* node);
-
-    // Utility methods
+    double evaluate(const ExprNode* node);
+    double performBinaryOperation(const std::string& op, double left, double right);
+    double evaluate(const NumberNode* node);
+    double evaluate(const BinaryExprNode* node);
+    double evaluate(const UnaryExprNode* node);
+    double evaluate(const BooleanNode* node);
 };

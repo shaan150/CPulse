@@ -11,8 +11,19 @@ enum class TokenType {
     DIVIDE,
     LPAREN,
     RPAREN,
+    TRUE,
+    FALSE,
+    EQUAL_TO,
+    NOT_EQUAL,
+    LESS_THAN,
+    GREATER_THAN,
+    LESS_EQUAL,
+    GREATER_EQUAL,
+    LOGICAL_AND,
+    LOGICAL_OR,
+    NOT,
     EOL,
-    EOFI,
+    EOFI
 };
 
 // Optional: Function to convert TokenType to a readable string

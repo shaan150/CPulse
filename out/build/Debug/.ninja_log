@@ -1,0 +1,14 @@
+# ninja log v5
+11	1348	7350956151018486	CMakeFiles/CPulse.dir/CPulse.cpp.obj	54db1bc8ef68df88
+21	709	7346598783836449	CMakeFiles/CPulse.dir/Classes/AST.CPP.obj	67434be8be4e38f5
+8	36	0	clean	3f9b83505c84670f
+11	1145	7350977112061249	CMakeFiles/CPulse.dir/Classes/Lexer.cpp.obj	4345a57bbd5def69
+1145	1395	7350977114051283	CPulse.exe	72fe102fa7d921c7
+17	801	7350956145538545	CMakeFiles/CPulse.dir/Classes/CodeGenerator.cpp.obj	cec5e2ed6aa35bb1
+14	826	7350956145788497	CMakeFiles/CPulse.dir/Classes/Parser.cpp.obj	fd32aa065584ab4c
+12	354	7350535192617136	CMakeFiles/CPulse.dir/Classes/Enums/TokenTypes.cpp.obj	4ce32aed5ffbb203
+20	434	7346599197435434	CMakeFiles/CPulse.dir/Classes/AST.cpp.obj	d3539c57d62aa6df
+2	860	7350980807410766	CMakeFiles/CPulse.dir/Classes/Lexer.cpp.obj	4345a57bbd5def69
+861	1168	7350980810030895	CPulse.exe	72fe102fa7d921c7
+3	877	7350981462472781	CMakeFiles/CPulse.dir/Classes/Lexer.cpp.obj	4345a57bbd5def69
+878	1130	7350981464512783	CPulse.exe	72fe102fa7d921c7

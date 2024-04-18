@@ -15,12 +15,21 @@ private:
     size_t pos;        // Current position in the input string
     size_t line;       // Current line number in the input string for error reporting
     size_t column;     // Current column number in the input string for error reporting
+    int parenthesesCount; // Count of parentheses for error checking
 
     // Method to read a number from the input string and return a Token
     Token readNumber();
 
     // Method to handle operators, taking the current operator character and the tokens vector
     void handleOperators(std::vector<Token>& tokens, char current);
+
+    void handleCalculationOperators(std::vector<Token>& tokens, char current);
+
+    void handleComparisonOperators(std::vector<Token>& tokens, char current);
+
+    void handleLogicalOperators(std::vector<Token>& tokens, char current);
+
+    void handleParentheses(std::vector<Token>& tokens, char current);
 
     // Utility method to check if a TokenType is considered an operator
     bool isOperator(TokenType type);

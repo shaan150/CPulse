@@ -1,4 +1,5 @@
 ﻿#include "CPulse.h"
+#include "TokenTypes.h"
 #include <fstream>
 #include <filesystem>
 #include <iostream>
@@ -19,14 +20,20 @@ void CPulse::processFile(const std::string& filePath) {
 
     try {
         Lexer lexer(content);  // Initialize the lexer with the entire content
-        auto tokens = lexer.tokenize(); // Tokenize the entire content
+        std::vector<Token> tokens = lexer.tokenize(); // Tokenize the entire content
 
-        Parser parser(tokens); // Initialize the parser with the tokens
-        parser.parseProgram(); // Parse the program
+        // print the tokens
+        for (const auto& token : tokens) {
+			std::cout << "Token: " << token.value << " Type: " << tokenTypeToString(token.type) << std::endl;
+		}
+
+        Parser parser(tokens);  // Initialize the parser with the tokens
+        parser.parse();  // Parse the tokens
+
 
     }
     catch (const std::runtime_error& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 
     file.close();
@@ -35,7 +42,7 @@ void CPulse::processFile(const std::string& filePath) {
 int main() {
 
     CPulse cpulse;
-    cpulse.processFile("no errors.txt");
+    cpulse.processFile("BooleanLogicExamples.txt");
 
     return 0;
 }
