@@ -29,7 +29,7 @@ add_executable(CPulse
     Classes/Parser.cpp
     Classes/CodeGenerator.h
     Classes/CodeGenerator.cpp # Updated extension from .CPP to .cpp for consistency
-)
+ "Classes/Enums/VariableTypes.cpp")
 
 # Include directories
 include_directories("Classes" "Classes/Enums" "Classes/Structs")

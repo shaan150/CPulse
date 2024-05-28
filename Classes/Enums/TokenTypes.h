@@ -5,6 +5,7 @@
 
 enum class TokenType {
     NUMBER,
+    STRING,
     PLUS,
     MINUS,
     MULTIPLY,
@@ -22,6 +23,8 @@ enum class TokenType {
     LOGICAL_AND,
     LOGICAL_OR,
     NOT,
+    IDENTIFIER,
+    ASSIGN,
     EOL,
     EOFI
 };

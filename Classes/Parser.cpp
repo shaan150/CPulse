@@ -80,6 +80,16 @@ void Parser::consume(TokenType type, const std::string& message) {
 	}
 }
 
+std::unique_ptr<ExprNode> Parser::declaration() {
+	if (match({ TokenType::IDENTIFIER }) && match({ TokenType::ASSIGN })) {
+		std::string varName = previous().value;
+		std::unique_ptr<ExprNode> value = expression();
+		variables[varName] = std::move(value);
+		return std::make_unique<VariableAssignNode>(varName, std::move(value));  // Custom node type for assignments
+	}
+	return expression();  // Fall back to parsing a regular expression
+}
+
 
 std::unique_ptr<ExprNode> Parser::expression()
 {
@@ -173,8 +183,6 @@ std::unique_ptr<ExprNode> Parser::unary(){
 	}
 
 	return primary();
-
-	
 }
 
 std::unique_ptr<ExprNode> Parser::primary() {
@@ -183,6 +191,13 @@ std::unique_ptr<ExprNode> Parser::primary() {
 		double value = std::stod(previous().value);
 		return std::make_unique<NumberNode>(value);
 	}
+
+	if (match({ TokenType::STRING })) {
+		// Create a string node based on the token value
+		std::string value = previous().value;
+		return std::make_unique<StringNode>(value);
+	}
+
 	if (match({ TokenType::FALSE, TokenType::TRUE })) {
 		// Create a boolean node based on the token type
 		bool value = previous().type == TokenType::TRUE;
@@ -195,6 +210,8 @@ std::unique_ptr<ExprNode> Parser::primary() {
 		consume(TokenType::RPAREN, "Expected ')' after expression");
 		return expr;
 	}
+
+	throw std::runtime_error("Expected an expression");
 
 }
 

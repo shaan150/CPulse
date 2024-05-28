@@ -2,8 +2,12 @@
 #pragma once
 #include "Enums/TokenTypes.h"
 #include "Structs/Token.h"
-#include <string>
-#include <vector>
+#include <cctype>
+#include <stdexcept>
+#include <sstream>
+#include <unordered_map>
+#include <iostream>
+#include "VariableTypes.h"
 
 class Lexer {
 public:
@@ -16,6 +20,19 @@ private:
     size_t line;       // Current line number in the input string for error reporting
     size_t column;     // Current column number in the input string for error reporting
     int parenthesesCount; // Count of parentheses for error checking
+    std::unordered_map<std::string, TokenType> keywords;
+
+    void initializeKeywords() {
+        keywords = {
+            {"true", TokenType::TRUE},
+            {"false", TokenType::FALSE},
+            {"and", TokenType::LOGICAL_AND},
+            {"or", TokenType::LOGICAL_OR},
+            {"not", TokenType::NOT}
+        };
+    }
+
+    std::string preprocessing(const std::string& input); // Method to get the current line for error reporting without whitespace
 
     // Method to read a number from the input string and return a Token
     Token readNumber();
@@ -32,5 +49,5 @@ private:
     void handleParentheses(std::vector<Token>& tokens, char current);
 
     // Utility method to check if a TokenType is considered an operator
-    bool isOperator(TokenType type);
+    bool isOperator(char);
 };

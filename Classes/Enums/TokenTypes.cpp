@@ -4,6 +4,7 @@ std::string tokenTypeToString(TokenType type)
 {
     switch (type) {
         case TokenType::NUMBER: return "NUMBER";
+        case TokenType::STRING: return "STRING";
         case TokenType::PLUS: return "PLUS";
         case TokenType::MINUS: return "MINUS";
         case TokenType::MULTIPLY: return "MULTIPLY";
@@ -20,6 +21,8 @@ std::string tokenTypeToString(TokenType type)
         case TokenType::GREATER_EQUAL: return "GREATER_EQUAL";
         case TokenType::LOGICAL_AND: return "LOGICAL_AND";
         case TokenType::LOGICAL_OR: return "LOGICAL_OR";
+        case TokenType::IDENTIFIER: return "IDENTIFIER";
+        case TokenType::ASSIGN: return "ASSIGN";
         case TokenType::NOT: return "NOT";
         case TokenType::EOL: return "EOL";
         case TokenType::EOFI: return "EOFI";

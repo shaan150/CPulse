@@ -7,7 +7,7 @@
 // Base class for all AST nodes.
 class ASTNode {
 public:
-    virtual ~ASTNode() = default;  // Ensure proper cleanup with a virtual destructor.
+    virtual ~ASTNode() = default;  // Ensure proper cleanup with a virtual destructor
 };
 
 // Expression node base class for all kinds of expressions.
@@ -44,6 +44,14 @@ public:
 
     explicit NumberNode(double value) : value(value) {}
 };
+
+// Represents string literals (e.g., "hello").
+class StringNode : public ExprNode {
+public:
+	std::string value; // The string value
+
+	explicit StringNode(std::string value) : value(std::move(value)) {}
+};;
 
 // Represents boolean literals (e.g., "true", "false").
 class BooleanNode : public ExprNode {
