@@ -37,6 +37,8 @@ private:
 
     std::unique_ptr<ExprNode> declaration();  // Entry point for declaration parsing
     std::unique_ptr<ExprNode> expression();  // Entry point for expression parsing
+    std::unique_ptr<ExprNode> assignment();  // Entry point for assignment parsing
+    std::unique_ptr<ExprNode> printStatement();
     std::unique_ptr<ExprNode> logicalOr();   // Handles the logical OR
     std::unique_ptr<ExprNode> logicalAnd();  // Handles the logical AND
     std::unique_ptr<ExprNode> equality();    // Handles == and !=
@@ -44,8 +46,7 @@ private:
     std::unique_ptr<ExprNode> term();        // Handles +, -
     std::unique_ptr<ExprNode> factor();      // Handles *, /
     std::unique_ptr<ExprNode> unary();       // Handles unary operators like - and !
-    std::unique_ptr<ExprNode> primary();     // Handles numbers and parentheses
+    std::unique_ptr<ExprNode> primary();     // Handles numbers, strings, booleans, identifiers, and parentheses
 
     void synchronize();
-
 };

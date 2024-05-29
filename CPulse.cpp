@@ -42,7 +42,7 @@ void CPulse::processFile(const std::string& filePath) {
 int main() {
 
     CPulse cpulse;
-    cpulse.processFile("BooleanLogicExamples.txt");
+    cpulse.processFile("variable_test.txt");
 
     return 0;
 }

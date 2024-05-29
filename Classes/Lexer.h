@@ -28,7 +28,8 @@ private:
             {"false", TokenType::FALSE},
             {"and", TokenType::LOGICAL_AND},
             {"or", TokenType::LOGICAL_OR},
-            {"not", TokenType::NOT}
+            {"not", TokenType::NOT},
+            {"print", TokenType::PRINT}
         };
     }
 
@@ -47,6 +48,8 @@ private:
     void handleLogicalOperators(std::vector<Token>& tokens, char current);
 
     void handleParentheses(std::vector<Token>& tokens, char current);
+
+    Token readIdentifier(); // Method to read an identifier and return a Token
 
     // Utility method to check if a TokenType is considered an operator
     bool isOperator(char);

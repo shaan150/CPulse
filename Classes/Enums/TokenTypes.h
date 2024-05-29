@@ -23,6 +23,7 @@ enum class TokenType {
     LOGICAL_AND,
     LOGICAL_OR,
     NOT,
+    PRINT,
     IDENTIFIER,
     ASSIGN,
     EOL,

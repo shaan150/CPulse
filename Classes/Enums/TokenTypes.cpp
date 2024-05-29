@@ -21,6 +21,7 @@ std::string tokenTypeToString(TokenType type)
         case TokenType::GREATER_EQUAL: return "GREATER_EQUAL";
         case TokenType::LOGICAL_AND: return "LOGICAL_AND";
         case TokenType::LOGICAL_OR: return "LOGICAL_OR";
+        case TokenType::PRINT: return "PRINT";
         case TokenType::IDENTIFIER: return "IDENTIFIER";
         case TokenType::ASSIGN: return "ASSIGN";
         case TokenType::NOT: return "NOT";

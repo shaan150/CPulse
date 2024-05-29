@@ -31,7 +31,7 @@ public:
 class UnaryExprNode : public ExprNode {
 public:
     std::unique_ptr<ExprNode> operand; // The operand
-    std::string op;                           // The operator
+    std::string op;                    // The operator
 
     UnaryExprNode(std::string op, std::unique_ptr<ExprNode> operand)
         : operand(std::move(operand)), op(op) {}
@@ -48,10 +48,10 @@ public:
 // Represents string literals (e.g., "hello").
 class StringNode : public ExprNode {
 public:
-	std::string value; // The string value
+    std::string value; // The string value
 
-	explicit StringNode(std::string value) : value(std::move(value)) {}
-};;
+    explicit StringNode(std::string value) : value(std::move(value)) {}
+};
 
 // Represents boolean literals (e.g., "true", "false").
 class BooleanNode : public ExprNode {
@@ -59,4 +59,31 @@ public:
     bool value; // The boolean value
 
     explicit BooleanNode(bool value) : value(value) {}
+};
+
+// Represents a variable (e.g., "x", "y").
+class VariableNode : public ExprNode {
+public:
+    std::string name; // The variable name
+
+    explicit VariableNode(std::string name) : name(std::move(name)) {}
+};
+
+// Represents an assignment (e.g., "x = 1").
+class AssignNode : public ExprNode {
+public:
+    std::string name;                // The variable name
+    std::unique_ptr<ExprNode> value; // The assigned value
+
+    AssignNode(std::string name, std::unique_ptr<ExprNode> value)
+        : name(std::move(name)), value(std::move(value)) {}
+};
+
+// Represents a print statement (e.g., "print x").
+class PrintNode : public ExprNode {
+public:
+    std::unique_ptr<ExprNode> expression; // The expression to print
+
+    explicit PrintNode(std::unique_ptr<ExprNode> expression)
+        : expression(std::move(expression)) {}
 };

@@ -2,20 +2,14 @@
 
 Lexer::Lexer(const std::string& input)
     : input(input), pos(0), line(1), column(0), parenthesesCount(0) {
-	// Constructor that initializes the input string and sets the position, line, and column to 0
     initializeKeywords();
 }
-
-
 
 std::vector<Token> Lexer::tokenize() {
     std::vector<Token> tokens;
     std::string currentToken;
     bool inComment = false;
     bool inString = false;
-
-    // create a hashmap for variables and their token values
-    std::unordered_map<std::string, Token> variables;
 
     while (pos < input.length()) {
 
@@ -43,7 +37,6 @@ std::vector<Token> Lexer::tokenize() {
             tokens.push_back(readNumber());
             continue;
         }
-
 
         if (input[pos] == '"') {
             if (!inString) {
@@ -74,16 +67,7 @@ std::vector<Token> Lexer::tokenize() {
         }
 
         if (std::isalpha(input[pos]) && !inString && !inComment) {
-            std::string word;
-            while (pos < input.length() && (std::isalnum(input[pos]) || input[pos] == '_')) {
-                word += input[pos++];
-                column++;
-            }
-
-            if (keywords.find(word) != keywords.end()) {
-                tokens.push_back(Token(keywords[word], word, line, column));
-
-            }
+            tokens.push_back(readIdentifier());
             continue;
         }
 
@@ -94,10 +78,8 @@ std::vector<Token> Lexer::tokenize() {
         }
 
         // Handling operators directly here
-        if (!inComment && !inString && input[pos] != ' ')
-        {
+        if (!inComment && !inString && input[pos] != ' ') {
             handleOperators(tokens, input[pos]);
-
             continue;
         }
 
@@ -135,19 +117,22 @@ Token Lexer::readNumber() {
 }
 
 void Lexer::handleOperators(std::vector<Token>& tokens, char current) {
-
     if (pos == input.length() - 1) {
-		std::ostringstream msg;
-		msg << "Syntax Error: Unexpected character '" << current << "' at line " << line << ", value " << current;
-		throw std::runtime_error(msg.str());
-	}
+        std::ostringstream msg;
+        msg << "Syntax Error: Unexpected character '" << current << "' at line " << line << ", value " << current;
+        throw std::runtime_error(msg.str());
+    }
 
     switch (current) {
     case '+': case '-': case '*': case '/':
-        // Check next character to handle cases like +=, -=, etc., if needed
         handleCalculationOperators(tokens, current);
         break;
-    case '=': case '!': case '<': case '>':
+    case '=':
+        tokens.push_back(Token(TokenType::ASSIGN, "=", line, column));
+        ++pos;
+        ++column;
+        break;
+    case '!': case '<': case '>':
         handleComparisonOperators(tokens, current);
         break;
     case '&': case '|':
@@ -159,15 +144,14 @@ void Lexer::handleOperators(std::vector<Token>& tokens, char current) {
     case '\\':
         break; // Ignore backslashes
     case ' ':
-		break; // Ignore spaces
+        break; // Ignore spaces
     case '\n':
-		break; // Ignore newlines
+        break; // Ignore newlines
     default:
         std::ostringstream msg;
         msg << "Syntax Error: Unexpected character '" << current << "' at line " << line << ", value " << current;
         throw std::runtime_error(msg.str());
     }
-
 }
 
 void Lexer::handleComparisonOperators(std::vector<Token>& tokens, char current) {
@@ -195,13 +179,12 @@ void Lexer::handleComparisonOperators(std::vector<Token>& tokens, char current) 
         tokens.push_back(Token(type, std::string(1, current), line, column));
     }
     else if (current == '!') {
-		tokens.push_back(Token(TokenType::NOT, "!", line, column));
-	}
+        tokens.push_back(Token(TokenType::NOT, "!", line, column));
+    }
     else {
         throw std::runtime_error("Syntax error: Unrecognized or incomplete comparison operator '" + op + "' at line " + std::to_string(line) + ", value " + current);
-        }
-
     }
+}
 
 void Lexer::handleLogicalOperators(std::vector<Token>& tokens, char current) {
     std::string op(1, current); // Start with the current character
@@ -219,87 +202,72 @@ void Lexer::handleLogicalOperators(std::vector<Token>& tokens, char current) {
 }
 
 void Lexer::handleCalculationOperators(std::vector<Token>& tokens, char current) {
-    // Start with the current character
     std::string op(1, current);
     TokenType type = TokenType::PLUS;  // Default to PLUS for initialization
 
-    // Skip any whitespace after the operator to handle cases like '1 - -2'
     while (pos + 1 < input.length() && std::isspace(input[pos + 1])) {
         ++pos;  // Move past the whitespace
         ++column;
     }
 
-    // Move past the operator
     ++pos;
     ++column;
 
-    // Check if the next character is also an operator or a digit
     if (pos < input.length() && std::isdigit(input[pos])) {
-        // Direct digit after operator
         tokens.push_back(Token(type, op, line, column)); // Add the operator
         tokens.push_back(readNumber()); // Read the number
-    } else if (pos < input.length() && (input[pos] == '+' || input[pos] == '-' || input[pos] == '*' || input[pos] == '/')) {
-        // Handle consecutive operators
+    }
+    else if (pos < input.length() && (input[pos] == '+' || input[pos] == '-' || input[pos] == '*' || input[pos] == '/')) {
         char nextOp = input[pos];
         if (current == '-' && nextOp == '-') {
-            // Two consecutive minuses turn into a plus
             type = TokenType::PLUS;
             ++pos;  // Skip the next minus
             ++column;
-            // Again skip any whitespace after the operator
             while (pos < input.length() && std::isspace(input[pos])) {
                 ++pos;
                 ++column;
             }
-            // Check if next character is a digit, then read number
             if (std::isdigit(input[pos])) {
                 tokens.push_back(Token(type, "+", line, column));  // Use + instead of --
                 tokens.push_back(readNumber());
-            } else {
-                // Handling error if no number follows
+            }
+            else {
                 std::ostringstream msg;
                 msg << "Syntax error: Expected a number after '--' at line " << line << ", value " << input[pos];
                 throw std::runtime_error(msg.str());
             }
-        } else if (current == '-' && std::isdigit(input[pos + 1])) {
-            // Case: - followed by a digit
+        }
+        else if (current == '-' && std::isdigit(input[pos + 1])) {
             tokens.push_back(Token(TokenType::MINUS, "-", line, column));
             ++pos; // Move past the minus
             ++column;
             tokens.push_back(readNumber());
-        } else {
-            // More than one non-minus operator or improperly used minus
+        }
+        else {
             std::ostringstream msg;
             msg << "Syntax error: Invalid use of consecutive operators at line " << line << ", value " << input[pos];
             throw std::runtime_error(msg.str());
         }
-    } else {
-        // If it's just the operator and then non-digit, non-operator
+    }
+    else {
         tokens.push_back(Token(type, op, line, column));
     }
 }
 
-
 void Lexer::handleParentheses(std::vector<Token>& tokens, char current) {
-    //save the current position and column
     size_t savePos = pos;
     size_t saveColumn = column;
 
-    // Increment position and column as we're consuming the parenthesis
     ++pos;
     ++column;
 
-    // Check the type of parenthesis and push the corresponding token
     if (current == '(') {
         tokens.push_back(Token(TokenType::LPAREN, "(", line, column));
-        // Increment the count of open parentheses
         parenthesesCount++;
     }
     else if (current == ')') {
-        // Decrement the count of open parentheses
         parenthesesCount--;
         if (parenthesesCount < 0) {
-            // More closing parentheses than opening ones
             std::ostringstream msg;
             msg << "Syntax error: Unmatched closing parenthesis at line " << line << ", value " << input[pos];
             throw std::runtime_error(msg.str());
@@ -308,9 +276,20 @@ void Lexer::handleParentheses(std::vector<Token>& tokens, char current) {
     }
 }
 
-bool Lexer::isOperator(char op)
-{
-    // Check if the character is an operator
-    return (op == '+' || op == '-' || op == '*' || op == '/' || op == '=' || op == '!' || op == '<' || op == '>' || op == '&' || op == '|' || op == '(' || op == ')');
+Token Lexer::readIdentifier() {
+    size_t start = pos;
+    while (pos < input.length() && (std::isalnum(input[pos]) || input[pos] == '_')) {
+        ++pos;
+        ++column;
+    }
+    std::string identifier = input.substr(start, pos - start);
+
+    if (keywords.find(identifier) != keywords.end()) {
+        return Token(keywords[identifier], identifier, line, column);
+    }
+    return Token(TokenType::IDENTIFIER, identifier, line, column);
 }
 
+bool Lexer::isOperator(char op) {
+    return (op == '+' || op == '-' || op == '*' || op == '/' || op == '=' || op == '!' || op == '<' || op == '>' || op == '&' || op == '|' || op == '(' || op == ')');
+}
