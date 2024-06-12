@@ -21,15 +21,18 @@ add_executable(CPulse
     CPulse.h
     Classes/Lexer.cpp
     Classes/Lexer.h
-    Classes/Enums/TokenTypes.h
-    Classes/Enums/TokenTypes.cpp
-    Classes/Structs/Token.h
+    Classes/Enums/TokenType.h
+    Classes/Enums/TokenType.cpp
+    Classes/Structs/Token/Token.h
     Classes/AST.h
     Classes/Parser.h
     Classes/Parser.cpp
     Classes/CodeGenerator.h
     Classes/CodeGenerator.cpp # Updated extension from .CPP to .cpp for consistency
- "Classes/Enums/VariableTypes.cpp")
+    
+    Classes/Structs/Maps/OperatorMap.h
+    Classes/Structs/Maps/KeywordMap.h 
+     "Classes/Structs/Maps/KeywordMap.cpp" "Classes/Structs/Maps/OperatorMap.cpp" "Classes/Structs/Value.h")
 
 # Include directories
 include_directories("Classes" "Classes/Enums" "Classes/Structs")

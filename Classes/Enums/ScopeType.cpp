@@ -1,4 +1,4 @@
-#include "ScopeTypes.h"
+#include "ScopeType.h"
 
 std::string scopeTypeToString(ScopeType type)
 {

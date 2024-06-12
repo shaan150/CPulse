@@ -1,5 +1,5 @@
 ﻿#include "CPulse.h"
-#include "TokenTypes.h"
+#include "TokenType.h"
 #include <fstream>
 #include <filesystem>
 #include <iostream>
@@ -26,8 +26,8 @@ void CPulse::processFile(const std::string& filePath) {
         for (const auto& token : tokens) {
 			std::cout << "Token: " << token.value << " Type: " << tokenTypeToString(token.type) << std::endl;
 		}
-
-        Parser parser(tokens);  // Initialize the parser with the tokens
+        CodeGenerator codeGen;
+        Parser parser(tokens, codeGen);  // Initialize the parser with the tokens
         parser.parse();  // Parse the tokens
 
 

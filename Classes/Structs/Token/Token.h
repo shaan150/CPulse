@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "TokenTypes.h"
+#include "TokenType.h"
 
 struct Token {
     TokenType type;

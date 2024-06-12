@@ -1,133 +1,233 @@
 #include "CodeGenerator.h"
 
 void CodeGenerator::execute(const ExprNode* node) {
-    auto value = evaluate(node);
+    if (auto blockNode = dynamic_cast<const BlockNode*>(node)) {
+        executeBlock(blockNode);
+    }
+    else {
+        evaluate(node);
+    }
+}
+
+void CodeGenerator::executeBlock(const BlockNode* blockNode) {
+    for (const auto& statement : blockNode->getStatements()) {
+        evaluate(statement.get());
+    }
 }
 
 Value CodeGenerator::evaluate(const ExprNode* node) {
+    // check if node is empty and return None
     if (!node) {
-        throw std::runtime_error("Node is empty");
-    }
+		return std::monostate();
+	}
+
 
     if (auto strNode = dynamic_cast<const StringNode*>(node)) {
-        return strNode->value;
+        return strNode->getValue();
     }
-    else if (auto numNode = dynamic_cast<const NumberNode*>(node)) {
-        return numNode->value;
+    else if (auto doubleNode = dynamic_cast<const DoubleNode*>(node)) {
+        return doubleNode->getValue();
     }
     else if (auto boolNode = dynamic_cast<const BooleanNode*>(node)) {
-        return boolNode->value;
+        return boolNode->getValue();
+    }
+    else if (auto intNode = dynamic_cast<const IntegerNode*>(node)) {
+        return intNode->getValue();
     }
     else if (auto varNode = dynamic_cast<const VariableNode*>(node)) {
-        auto it = variables.find(varNode->name);
+        auto it = variables.find(varNode->getName());
         if (it != variables.end()) {
             return it->second;
         }
-        throw std::runtime_error("Undefined variable: " + varNode->name);
+        throw std::runtime_error("Undefined variable: " + varNode->getName());
     }
     else if (auto assignNode = dynamic_cast<const AssignNode*>(node)) {
-        Value value = evaluate(assignNode->value.get());
-        variables[assignNode->name] = value;
+        Value value = evaluate(assignNode->getValue().get());
+        variables[assignNode->getName()] = value;
         return value;
     }
     else if (auto binNode = dynamic_cast<const BinaryExprNode*>(node)) {
-        Value left = evaluate(binNode->left.get());
-        Value right = evaluate(binNode->right.get());
-        return performBinaryOperation(binNode->op, left, right);
+        Value left = evaluate(binNode->getLeft().get());
+        Value right = evaluate(binNode->getRight().get());
+        return performBinaryOperation(binNode, left, right);
     }
     else if (auto unNode = dynamic_cast<const UnaryExprNode*>(node)) {
-        Value operand = evaluate(unNode->operand.get());
-        return performUnaryOperation(unNode->op, operand);
+        Value operand = evaluate(unNode->getOperand().get());
+        return performUnaryOperation(unNode->getToken(), unNode->getOp(), operand);
     }
     else if (auto prNode = dynamic_cast<const PrintNode*>(node)) {
-        Value value = evaluate(prNode->expression.get());
+        Value value = evaluate(prNode->getExpression().get());
 		printValue(value);
 		return value;
     }
+    else if (auto inNode = dynamic_cast<const InputNode*>(node)) {
+        Value value = evaluate(inNode->getExpression().get());
+        std::string input;
+        std::getline(std::cin, input);
+		return input;
+	}
+    else if (auto ifNode = dynamic_cast<const IfNode*>(node)) {
+        Value condition = evaluate(ifNode->getCondition().get());
+        auto thenBlock = ifNode->getThenBlock().get();
+        auto elseBlock = ifNode->getElseBlock().get();
+        if (ValueHelper::asBool(condition)) {
+			return evaluate(thenBlock);
+		}
+        else if (elseBlock) {
+			return evaluate(elseBlock);
+		}
+
+        return std::monostate();
+    }
+    else if (auto whileNode = dynamic_cast<const WhileNode*>(node)) {
+        while (true) {
+            Value condition = evaluate(whileNode->getCondition().get());
+            if (!ValueHelper::asBool(condition)) {
+                break;
+            }
+            evaluate(whileNode->getBlock().get());
+
+            // Re-evaluate condition immediately after executing the block
+            condition = evaluate(whileNode->getCondition().get());
+            if (!ValueHelper::asBool(condition)) {
+                break;
+            }
+        }
+        return std::monostate();
+    }
+    else if (auto blockNode = dynamic_cast<const BlockNode*>(node)) {
+		executeBlock(blockNode);
+		return std::monostate();
+	}
+
     throw std::runtime_error("Unsupported node type");
 }
 
-Value CodeGenerator::performBinaryOperation(const std::string& op, const Value& left, const Value& right) {
-    if (op == tokenTypeToString(TokenType::PLUS) || op == tokenTypeToString(TokenType::MINUS) || op == tokenTypeToString(TokenType::MULTIPLY) || op == tokenTypeToString(TokenType::DIVIDE)) {
-        if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-            return performArithmeticOperation(op, std::get<double>(left), std::get<double>(right));
+Value CodeGenerator::performBinaryOperation(auto binNode, const Value& left, const Value& right) {
+    const std::string& op = binNode->getOp();
+    // get the type of token
+    Token token = binNode->getToken();
+    std::string line = std::to_string(token.line);
+
+    if (token.type == TokenType::ARITHMETIC) {
+        if (ValueHelper::isDouble(left) && ValueHelper::isDouble(right)) {
+            double leftValue = ValueHelper::isDouble(left) ? ValueHelper::asDouble(left) : ValueHelper::asInt(left);
+            double rightValue = ValueHelper::isDouble(right) ? ValueHelper::asDouble(right) : ValueHelper::asInt(right);
+            return performArithmeticOperation(token, op, leftValue, rightValue);
+        }
+        else if (ValueHelper::isInt(left) && ValueHelper::isInt(right)) {
+            return performArithmeticOperation(token, op, ValueHelper::asInt(left), ValueHelper::asInt(right));
+        }
+        else if (ValueHelper::isDouble(left) && ValueHelper::isInt(right)) {
+			return performArithmeticOperation(token, op, ValueHelper::asDouble(left), ValueHelper::asInt(right));
+		}
+        else if (ValueHelper::isInt(left) && ValueHelper::isDouble(right)) {
+			return performArithmeticOperation(token, op, ValueHelper::asInt(left), ValueHelper::asDouble(right));
+		}
+        else if (ValueHelper::isString(left) && ValueHelper::isString(right)) {
+            return performStringOperation(token, op, left, right);
+        }
+        else if (ValueHelper::isString(left) && ValueHelper::isInt(right)) {
+            return performStringOperation(token, op, left, right);
+        }
+        else if (ValueHelper::isString(left) && ValueHelper::isDouble(right)) {
+            return performStringOperation(token, op, left, right);
+        }
+        else {
+            throw std::runtime_error("Arithmetic Operation Error: Unsupported for types " + ValueHelper::type(left) + " and " + ValueHelper::type(right) +
+            " at line " + line);
         }
     }
 
-    if (op == tokenTypeToString(TokenType::PLUS)) {
-        if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right)) {
-            return std::get<std::string>(left) + std::get<std::string>(right);
-        }
+
+    if (token.type == TokenType::COMPARISON) {
+        return performComparisonOperation(token, op, left, right);
     }
 
-    if (op == tokenTypeToString(TokenType::EQUAL_TO) || op == tokenTypeToString(TokenType::NOT_EQUAL) || op == tokenTypeToString(TokenType::LESS_THAN) || op == tokenTypeToString(TokenType::GREATER_THAN) || op == tokenTypeToString(TokenType::LESS_EQUAL) || op == tokenTypeToString(TokenType::GREATER_EQUAL)) {
-        return performComparisonOperation(op, left, right);
-    }
-
-    if (op == tokenTypeToString(TokenType::LOGICAL_AND) || op == tokenTypeToString(TokenType::LOGICAL_OR)) {
+    if (token.type == TokenType::LOGICAL) {
         if (std::holds_alternative<bool>(left) && std::holds_alternative<bool>(right)) {
-            return performLogicalOperation(op, std::get<bool>(left), std::get<bool>(right));
+            return performLogicalOperation(token, op, std::get<bool>(left), std::get<bool>(right));
         }
     }
 
-    throw std::runtime_error("Type mismatch or unsupported operation: " + op);
+    throw std::runtime_error("Arithmetic Operation Error: Type mismatch or unsupported operation " + op + " at line " + line);
 }
 
-Value CodeGenerator::performArithmeticOperation(const std::string& op, double left, double right) {
-    if (op == tokenTypeToString(TokenType::PLUS)) return left + right;
-    if (op == tokenTypeToString(TokenType::MINUS)) return left - right;
-    if (op == tokenTypeToString(TokenType::MULTIPLY)) return left * right;
-    if (op == tokenTypeToString(TokenType::DIVIDE)) {
-        if (right == 0) throw std::runtime_error("Division by zero");
+Value CodeGenerator::performArithmeticOperation(const Token token, const std::string& op, const double left, const double right) {
+    std::string line = std::to_string(token.line);
+    if (op == "+") return left + right;
+    if (op == "-") return left - right;
+    if (op == "*") return left * right;
+    if (op == "/") {
+        if (right == 0) throw std::runtime_error("Arithmetic Operation Error: Division by zero at line " + line);
         return left / right;
     }
-    throw std::runtime_error("Unsupported arithmetic operator: " + op);
+    throw std::runtime_error("Arithmetic Operation Error: Invalid Operator " + op + " at line " + line);
 }
 
-Value CodeGenerator::performComparisonOperation(const std::string& op, const Value& left, const Value& right) {
-    if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-        double l = std::get<double>(left);
-        double r = std::get<double>(right);
-        if (op == tokenTypeToString(TokenType::EQUAL_TO)) return l == r;
-        if (op == tokenTypeToString(TokenType::NOT_EQUAL)) return l != r;
-        if (op == tokenTypeToString(TokenType::LESS_THAN)) return l < r;
-        if (op == tokenTypeToString(TokenType::GREATER_THAN)) return l > r;
-        if (op == tokenTypeToString(TokenType::LESS_EQUAL)) return l <= r;
-        if (op == tokenTypeToString(TokenType::GREATER_EQUAL)) return l >= r;
-    }
-    else if (std::holds_alternative<bool>(left) && std::holds_alternative<bool>(right)) {
-        bool l = std::get<bool>(left);
-        bool r = std::get<bool>(right);
-        if (op == tokenTypeToString(TokenType::EQUAL_TO)) return l == r;
-        if (op == tokenTypeToString(TokenType::NOT_EQUAL)) return l != r;
-    }
-    else if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right)) {
-        std::string l = std::get<std::string>(left);
-        std::string r = std::get<std::string>(right);
-        if (op == tokenTypeToString(TokenType::EQUAL_TO)) return l == r;
-        if (op == tokenTypeToString(TokenType::NOT_EQUAL)) return l != r;
-    }
-    throw std::runtime_error("Type mismatch or unsupported comparison operator: " + op);
+Value CodeGenerator::performStringOperation(const Token token, const std::string& op, const Value& left, const Value& right) {
+	std::string line = std::to_string(token.line);
+	if (op == "+") return ValueHelper::asString(left) + ValueHelper::asString(right);
+	throw std::runtime_error("String Operation Error: Invalid Operator " + op + " at line " + line);
 }
 
-Value CodeGenerator::performLogicalOperation(const std::string& op, bool left, bool right) {
-    if (op == tokenTypeToString(TokenType::LOGICAL_AND)) return left && right;
-    if (op == tokenTypeToString(TokenType::LOGICAL_OR)) return left || right;
-    throw std::runtime_error("Unsupported logical operator: " + op);
+Value CodeGenerator::performComparisonOperation(const Token& token, const std::string& op, const Value& left, const Value& right) {
+    std::string line = std::to_string(token.line);
+    if (op == "==") return left == right;
+    if (op == "!=") return left != right;
+    // check if the values are of type double or int
+    if (ValueHelper::isDouble(left) || ValueHelper::isDouble(right) || ValueHelper::isInt(left) || ValueHelper::isInt(right)) {
+        double l = ValueHelper::isDouble(left) ? ValueHelper::asDouble(left) : ValueHelper::asInt(left);
+        double r = ValueHelper::isDouble(right) ? ValueHelper::asDouble(right) : ValueHelper::asInt(right);
+
+        if (op == "<") return l < r;
+        if (op == "<=") return l <= r;
+        if (op == ">") return l > r;
+        if (op == ">=") return l >= r;
+	}
+    throw std::runtime_error("Comparison Operation Error: Unsupported comparison operator " + op + " at line " + line);
 }
 
-Value CodeGenerator::performUnaryOperation(const std::string& op, const Value& operand) {
-    if (op == tokenTypeToString(TokenType::MINUS) && std::holds_alternative<double>(operand)) {
-        return -std::get<double>(operand);
+Value CodeGenerator::performLogicalOperation(const Token token, const std::string& op, bool left, bool right) {
+    std::string line = std::to_string(token.line);
+    if (op == "and") return left && right;
+    if (op == "or") return left || right;
+
+    throw std::runtime_error("Logical Operation Error: Unsupported logical operator " + op + " at line " + line);
+}
+Value CodeGenerator::performUnaryOperation(const Token& token, const std::string& op, const Value& operand) {
+    std::string line = std::to_string(token.line);
+
+
+    // Check for integer and double types
+    if (ValueHelper::isInt(operand)) {
+        int o = ValueHelper::asInt(operand);
+        if (op == "-") {
+            return -o;
+        }
     }
-    if (op == tokenTypeToString(TokenType::NOT) && std::holds_alternative<bool>(operand)) {
+    else if (ValueHelper::isDouble(operand)) {
+        double o = ValueHelper::asDouble(operand);
+        if (op == "-") {
+            return -o;
+        }
+    }
+
+    // Check for boolean type
+    if (op == "!" && std::holds_alternative<bool>(operand)) {
         return !std::get<bool>(operand);
     }
-    throw std::runtime_error("Unsupported unary operator: " + op);
+
+    throw std::runtime_error("Unary Operation Error: Unsupported unary operator " + op + " at line " + line);
 }
 
 void CodeGenerator::printValue(const Value& value) {
-    if (std::holds_alternative<double>(value)) {
+    if (std::holds_alternative<int>(value)) 
+    {
+		std::cout << std::get<int>(value) << std::endl;
+	}
+    else if (std::holds_alternative<double>(value)) 
+    {
         std::cout << std::get<double>(value) << std::endl;
     }
     else if (std::holds_alternative<bool>(value)) {

@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "Structs/Token/Token.h"
 
 // Base class for all AST nodes.
 class ASTNode {
@@ -13,77 +14,189 @@ public:
 // Expression node base class for all kinds of expressions.
 class ExprNode : public ASTNode {
 public:
+    ExprNode(const Token& token) : token(token) {}
     virtual ~ExprNode() = default;
+
+    const Token& getToken() const { return token; }
+
+private:
+    Token token;
 };
 
 // Represents a binary operation (e.g., addition, multiplication).
 class BinaryExprNode : public ExprNode {
 public:
-    std::unique_ptr<ExprNode> left;  // The left operand
-    std::unique_ptr<ExprNode> right; // The right operand
-    std::string op;                  // The operator
+    BinaryExprNode(const Token& token, std::unique_ptr<ExprNode> left, const std::string op, std::unique_ptr<ExprNode> right)
+        : ExprNode(token), left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
 
-    BinaryExprNode(std::unique_ptr<ExprNode> left, std::string op, std::unique_ptr<ExprNode> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
+    const std::unique_ptr<ExprNode>& getLeft() const { return left; }
+    const std::string& getOp() const { return op; }
+    const std::unique_ptr<ExprNode>& getRight() const { return right; }
+
+private:
+    std::unique_ptr<ExprNode> right;
+	const std::string op;
+	std::unique_ptr<ExprNode> left;
 };
 
 // Represents a unary operation (e.g., negation).
 class UnaryExprNode : public ExprNode {
 public:
-    std::unique_ptr<ExprNode> operand; // The operand
-    std::string op;                    // The operator
+    UnaryExprNode(const Token& token, const std::string op, std::unique_ptr<ExprNode> operand)
+        : ExprNode(token), operand(std::move(operand)), op(op) {}
 
-    UnaryExprNode(std::string op, std::unique_ptr<ExprNode> operand)
-        : operand(std::move(operand)), op(op) {}
+    const std::unique_ptr<ExprNode>& getOperand() const { return operand; }
+    const std::string& getOp() const { return op; }
+
+private:
+    std::unique_ptr<ExprNode> operand;
+    const std::string op;
+    
 };
 
-// Represents numeric literals (e.g., "123", "3.14").
-class NumberNode : public ExprNode {
+// Represents Double literals (e.g. "3.14").
+class DoubleNode : public ExprNode {
 public:
-    double value; // The numeric value
+    explicit DoubleNode(const Token& token, const double value) : ExprNode(token), value(value){}
 
-    explicit NumberNode(double value) : value(value) {}
+    const double getValue() const { return value; }
+
+private:
+    const double value;
+};
+
+// Represents Integer literals (e.g., "123").
+class IntegerNode : public ExprNode {
+public:
+	explicit IntegerNode(const Token& token, const int value) : ExprNode(token), value(value) {}
+
+	const int getValue() const { return value; }
+private:
+    const int value;
 };
 
 // Represents string literals (e.g., "hello").
 class StringNode : public ExprNode {
 public:
-    std::string value; // The string value
+    explicit StringNode(const Token& token, const std::string value) : ExprNode(token), value(std::move(value)) {}
 
-    explicit StringNode(std::string value) : value(std::move(value)) {}
+    const std::string getValue() const { return value; }
+
+private:
+    const std::string value;
 };
 
 // Represents boolean literals (e.g., "true", "false").
 class BooleanNode : public ExprNode {
 public:
-    bool value; // The boolean value
+    explicit BooleanNode(const Token& token, const bool value) : ExprNode(token), value(value) {}
 
-    explicit BooleanNode(bool value) : value(value) {}
+    const bool getValue() const { return value; }
+
+private:
+    const bool value;
 };
 
 // Represents a variable (e.g., "x", "y").
 class VariableNode : public ExprNode {
 public:
-    std::string name; // The variable name
+    explicit VariableNode(const Token& token, const std::string name) : ExprNode(token), name(std::move(name)) {}
 
-    explicit VariableNode(std::string name) : name(std::move(name)) {}
+    const std::string getName() const { return name; }
+
+private:
+    const std::string name;
 };
 
 // Represents an assignment (e.g., "x = 1").
 class AssignNode : public ExprNode {
 public:
-    std::string name;                // The variable name
-    std::unique_ptr<ExprNode> value; // The assigned value
+    AssignNode(const Token& token, const std::string name, std::unique_ptr<ExprNode> value)
+        : ExprNode(token), name(std::move(name)), value(std::move(value)) {}
 
-    AssignNode(std::string name, std::unique_ptr<ExprNode> value)
-        : name(std::move(name)), value(std::move(value)) {}
+    const std::string getName() const { return name; }
+
+    const std::unique_ptr<ExprNode>& getValue() const { return value; }
+
+private:
+    const std::string name;
+	std::unique_ptr<ExprNode> value;
 };
 
-// Represents a print statement (e.g., "print x").
+// Represents a function node with a name
 class PrintNode : public ExprNode {
 public:
-    std::unique_ptr<ExprNode> expression; // The expression to print
+    explicit PrintNode(const Token& token, std::unique_ptr<ExprNode> expression)
+        : ExprNode(token), expression(std::move(expression)) {}
 
-    explicit PrintNode(std::unique_ptr<ExprNode> expression)
-        : expression(std::move(expression)) {}
+    const std::unique_ptr<ExprNode>& getExpression() const { return expression; }
+private:
+    std::unique_ptr<ExprNode> expression; // The expression to print
+};
+
+
+// Represents a function node with a name
+class InputNode : public ExprNode {
+public:
+    explicit InputNode(const Token& token, std::unique_ptr<ExprNode> expression)
+        : ExprNode(token), expression(std::move(expression)) {}
+
+    const std::unique_ptr<ExprNode>& getExpression() const { return expression; }
+private:
+    std::unique_ptr<ExprNode> expression; // The expression to print
+};
+
+// Represents a block node with a list of statements
+class BlockNode : public ExprNode {
+public:
+    explicit BlockNode(const Token& token, std::vector<std::unique_ptr<ExprNode>> statements)
+        : ExprNode(token), statements(std::move(statements)) {}
+
+    const std::vector<std::unique_ptr<ExprNode>>& getStatements() const { return statements; }
+
+private:
+    std::vector<std::unique_ptr<ExprNode>> statements;
+};
+
+// Represents a function call node with a name and arguments
+class FunctionCallNode : public ExprNode {
+public:
+	explicit FunctionCallNode(const Token& token, const std::string name, std::unique_ptr<ExprNode> arg)
+		: ExprNode(token), name(std::move(name)), arg(std::move(arg)) {}
+
+	const std::string getName() const { return name; }
+	const std::unique_ptr<ExprNode>& getArg() const { return arg; }
+
+private:
+        const std::string name;
+        std::unique_ptr<ExprNode> arg;
+};
+
+// Represents an if-statement node
+class IfNode : public ExprNode {
+public:
+    IfNode(const Token& token, std::unique_ptr<ExprNode> condition, std::unique_ptr<BlockNode> thenBlock, std::unique_ptr<BlockNode> elseBlock = nullptr)
+        : ExprNode(token), condition(std::move(condition)), thenBlock(std::move(thenBlock)), elseBlock(std::move(elseBlock)) {}
+
+    const std::unique_ptr<ExprNode>& getCondition() const { return condition; }
+    const std::unique_ptr<BlockNode>& getThenBlock() const { return thenBlock; }
+    const std::unique_ptr<BlockNode>& getElseBlock() const { return elseBlock; }
+
+private:
+    std::unique_ptr<ExprNode> condition;
+    std::unique_ptr<BlockNode> thenBlock;
+    std::unique_ptr<BlockNode> elseBlock;
+};
+
+// Represents a while loop node
+class WhileNode : public ExprNode {
+public:
+    	WhileNode(const Token& token, std::unique_ptr<ExprNode> condition, std::unique_ptr<BlockNode> block)
+            		: ExprNode(token), condition(std::move(condition)), block(std::move(block)) {}
+        
+        const std::unique_ptr<ExprNode>& getCondition() const { return condition; }
+        const std::unique_ptr<BlockNode>& getBlock() const { return block; };
+private:
+    	std::unique_ptr<ExprNode> condition;
+		std::unique_ptr<BlockNode> block;
 };

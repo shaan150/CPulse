@@ -1,278 +1,289 @@
+// parser.cpp
+
 #include "Parser.h"
+#include <stdexcept>
 
-Parser::Parser(const std::vector<Token>& tokens)
-    : tokens(tokens),  // This initializes the member 'tokens' with a copy of the input parameter 'tokens'.
-    current(0)      // Initializing 'current' to 0.
-{}
+Parser::Parser(const std::vector<Token>& tokens, CodeGenerator& codeGen)
+    : tokens(tokens), pos(0), codeGen(codeGen) {}
 
-void Parser::parse() {
-    CodeGenerator codeGen;
-    try {
-        while (!isAtEnd()) {
-            if (peek().type == TokenType::EOFI) { // Check for the end-of-file indicator
-                break;
-            }
-            auto stmt = declaration(); // Parse the declaration
-            if (stmt) {
-                codeGen.execute(stmt.get()); // Execute the parsed statement using the CodeGenerator
-            }
-            if (!match({ TokenType::EOL, TokenType::EOFI })) { // Ensure each statement ends with a newline or EOF
-                synchronize(); // Synchronize to the next line if the current line ends improperly
-            }
-        }
-    }
-    catch (const std::runtime_error& error) {
-        std::cerr << "Parse error: " << error.what() << std::endl; // Handle any parsing errors
+const Token& Parser::current_token() const {
+    return tokens[pos];
+}
+
+void Parser::advance() {
+    if (pos < tokens.size()) {
+        pos++;
     }
 }
 
-bool Parser::match(std::initializer_list<TokenType> types)
-{
-    for (TokenType type : types) {
-        if (check(type)) {
+void Parser::expect(TokenType type) {
+    if (type == TokenType::EOL) {
+        if (current_token().type == TokenType::EOFI) {
+            return;
+        }
+    }
+
+    if (current_token().type != type) {
+        std::string line = std::to_string(current_token().line);
+        throw std::runtime_error("Syntax Error: Unexpected Token " + current_token().value + " at line " + line +
+            "\nExpected Type: " + tokenTypeToString(type));
+    }
+    advance();
+}
+
+std::unique_ptr<ASTNode> Parser::parse() {
+    return parse_statements();
+}
+
+std::unique_ptr<ASTNode> Parser::parse_statements() {
+    std::vector<std::unique_ptr<ExprNode>> statements;
+    while (current_token().type != TokenType::EOFI) {
+        if (current_token().type == TokenType::EOL) {
             advance();
-            return true;
+            continue; // Skip EOL tokens
         }
+        statements.push_back(std::unique_ptr<ExprNode>(dynamic_cast<ExprNode*>(parse_statement().release())));
     }
-
-    return false;
+    const Token blockToken = tokens.front();
+    auto blockNode = std::make_unique<BlockNode>(blockToken, std::move(statements));
+    codeGen.execute(blockNode.get());
+    return blockNode;
 }
 
-bool Parser::check(TokenType type) const
-{
-    if (isAtEnd()) return false;
-
-    return peek().type == type;
-}
-
-Token Parser::advance()
-{
-    if (!isAtEnd()) current++;
-
-    return previous();
-}
-
-bool Parser::isAtEnd() const
-{
-    return peek().type == TokenType::EOFI;
-}
-
-Token Parser::peek() const
-{
-    return tokens[current];
-}
-
-Token Parser::previous() const
-{
-    if (current > 0) {
-        return tokens[current - 1];
+std::unique_ptr<ExprNode> Parser::parse_statement() {
+    const Token& token = current_token();
+    if (token.type == TokenType::IF_CONDITION) {
+        return parse_if_statement();
     }
+    else if (token.type == TokenType::WHILE_LOOP) {
+		return parse_while_statement();
+	}
+	else
 
-    return tokens[0];
-}
-
-void Parser::consume(TokenType type, const std::string& message) {
-
-    if (type == TokenType::EOL) throw std::runtime_error("Expected a token, got EOL");
-
-    if (check(type)) {
-        advance();  // Move to the next token
+    if (token.value == "print") {
+        Token printToken = current_token();
+        advance();
+        expect(TokenType::LPARENTHESIS);
+        auto expr = parse_expression();
+        expect(TokenType::RPARENTHESIS);
+        expect(TokenType::EOL);
+        return std::make_unique<PrintNode>(printToken, std::move(expr));
     }
     else {
-        throw std::runtime_error(message);
+        auto expr = parse_expression();
+        expect(TokenType::EOL);
+        return expr;
     }
 }
 
-std::unique_ptr<ExprNode> Parser::declaration() {
-    try {
-        if (match({ TokenType::IDENTIFIER })) {
-            if (check(TokenType::ASSIGN)) {
-                return assignment();
+std::unique_ptr<ExprNode> Parser::parse_while_statement() {
+    Token whileToken = current_token();
+    advance(); // Move past 'while'
+    expect(TokenType::LPARENTHESIS);
+    auto condition = parse_expression();
+    expect(TokenType::RPARENTHESIS);
+    expect(TokenType::LBRACE);
+    auto block = parse_statements_block();
+    expect(TokenType::RBRACE);
+    return std::make_unique<WhileNode>(whileToken, std::move(condition), std::move(block));
+}
+
+std::unique_ptr<ExprNode> Parser::parse_if_statement() {
+    Token ifToken = current_token();
+    advance(); // Move past 'if'
+    expect(TokenType::LPARENTHESIS);
+    auto condition = parse_expression();
+    expect(TokenType::RPARENTHESIS);
+    expect(TokenType::LBRACE);
+    auto thenBlock = parse_statements_block();
+    expect(TokenType::RBRACE);
+
+    std::unique_ptr<BlockNode> elseBlock = nullptr;
+    if (current_token().type == TokenType::ELSE_CONDITION) {
+        advance(); // Move past 'else'
+        expect(TokenType::LBRACE);
+        elseBlock = parse_statements_block();
+        expect(TokenType::RBRACE);
+    }
+    return std::make_unique<IfNode>(ifToken, std::move(condition), std::move(thenBlock), std::move(elseBlock));
+}
+
+std::unique_ptr<BlockNode> Parser::parse_statements_block() {
+    std::vector<std::unique_ptr<ExprNode>> statements;
+    while (current_token().type != TokenType::RBRACE && current_token().type != TokenType::EOFI) {
+        if (current_token().type == TokenType::EOL) {
+            advance();
+            continue; // Skip EOL tokens
+        }
+        if (current_token().type == TokenType::IF_CONDITION) {
+            statements.push_back(parse_if_statement());
+            continue; // Skip to the next token
+        }
+
+        if (current_token().type == TokenType::WHILE_LOOP) {
+			statements.push_back(parse_while_statement());
+			continue; // Skip to the next token
+		}
+
+        statements.push_back(parse_statement());
+    }
+    Token blockToken = tokens.front();
+    return std::make_unique<BlockNode>(blockToken, std::move(statements));
+}
+
+std::unique_ptr<ExprNode> Parser::parse_expression() {
+    auto left = parse_term();
+
+    while (current_token().type == TokenType::EQUAL || current_token().type == TokenType::COMPARISON || current_token().type == TokenType::LOGICAL) {
+        Token op = current_token();
+
+        // Handle multi-character operators
+        std::string opValue = op.value;
+        advance();
+
+        // Check for operators like '!=' and '=='
+        if ((opValue == "!" || opValue == "=" || opValue == "<" || opValue == ">") && current_token().type == TokenType::EQUAL) {
+            opValue += current_token().value;
+            advance();
+        }
+
+        auto right = parse_term();
+
+        if (opValue == "==") {
+            op.type = TokenType::COMPARISON;
+            left = std::make_unique<BinaryExprNode>(op, std::move(left), "==", std::move(right));
+        }
+        else if (opValue == "!=") {
+            op.type = TokenType::COMPARISON;
+            left = std::make_unique<BinaryExprNode>(op, std::move(left), "!=", std::move(right));
+        }
+        else if (opValue == "=") {
+            left = std::make_unique<BinaryExprNode>(op, std::move(left), "=", std::move(right));
+        }
+        else {
+            left = std::make_unique<BinaryExprNode>(op, std::move(left), opValue, std::move(right));
+        }
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> Parser::parse_term() {
+    auto node = parse_factor();
+
+    while (current_token().type == TokenType::ARITHMETIC) {
+        Token op = current_token();
+        advance();
+        auto right = parse_factor();
+        node = std::make_unique<BinaryExprNode>(op, std::move(node), op.value, std::move(right));
+    }
+
+    return node;
+}
+
+std::unique_ptr<ExprNode> Parser::parse_factor() {
+    if (current_token().type == TokenType::LPARENTHESIS) {
+        advance();
+        auto node = parse_expression();
+        expect(TokenType::RPARENTHESIS);
+        return node;
+    }
+
+    if (current_token().type == TokenType::LOGICAL || current_token().type == TokenType::COMPARISON || current_token().value == "-") {
+        Token op = current_token();
+        advance();
+        auto operand = parse_factor();
+        return std::make_unique<UnaryExprNode>(op, op.value, std::move(operand));
+    }
+
+    return parse_primary();
+}
+
+std::unique_ptr<ExprNode> Parser::parse_primary() {
+    Token token = current_token();
+
+    if (token.type == TokenType::INTEGER) {
+        int value = std::stoi(token.value);
+        return parse_numeric_node<IntegerNode>(token, value);
+    }
+
+    if (token.type == TokenType::DOUBLE) {
+        double value = std::stod(token.value);
+        return parse_numeric_node<DoubleNode>(token, value);
+    }
+
+    if (token.type == TokenType::STRING) {
+        advance();
+        return std::make_unique<StringNode>(token, token.value);
+    }
+
+    if (token.type == TokenType::BOOLEAN) {
+        advance();
+        return std::make_unique<BooleanNode>(token, token.value == "true");
+    }
+
+    if (token.type == TokenType::IDENTIFIER) {
+        std::string identifier = token.value;
+        advance();
+        Token newToken = current_token();
+        if (newToken.type == TokenType::EQUAL) {
+            advance();
+            if (current_token().type == TokenType::EQUAL) {
+                // It's an equality comparison
+                advance();
+                auto value = parse_expression();
+                token.type = TokenType::COMPARISON;
+                return std::make_unique<BinaryExprNode>(token, std::make_unique<VariableNode>(token, identifier), "==", std::move(value));
+            }
+            else {
+                // It's an assignment
+                auto value = parse_expression();
+                return std::make_unique<AssignNode>(token, identifier, std::move(value));
             }
         }
 
-        if (match({ TokenType::PRINT })) {
-            return printStatement();
+        if (current_token().type == TokenType::LPARENTHESIS) {
+            // Function call
+            advance();
+            auto arg = parse_expression();
+            expect(TokenType::RPARENTHESIS);
+            if (identifier == "input") {
+                // create a print node to print the value
+                auto printNode = std::make_unique<PrintNode>(token, std::move(arg));
+                return std::make_unique<InputNode>(token, std::move(printNode));
+            }
+            return std::make_unique<FunctionCallNode>(token, identifier, std::move(arg));
         }
+        return std::make_unique<VariableNode>(token, identifier);
+    }
 
-        return expression();
-    }
-    catch (const std::runtime_error& error) {
-        synchronize();
-        return nullptr;
-    }
+    if (token.type == TokenType::EOFI || token.type == TokenType::EOL) {
+		return nullptr;
+	}
+
+    std::string line = std::to_string(token.line);
+    throw std::runtime_error("Syntax Error: Invalid Token " + token.value + " at line " + line);
 }
 
-std::unique_ptr<ExprNode> Parser::assignment() {
-    Token name = previous();
-    consume(TokenType::ASSIGN, "Expected '=' after variable name.");
-    std::unique_ptr<ExprNode> value = expression();
-    return std::make_unique<AssignNode>(name.value, std::move(value));
-}
+template <typename NodeType, typename ValueType>
+std::unique_ptr<ExprNode> Parser::parse_numeric_node(const Token& token, ValueType value) {
+    advance();
 
-std::unique_ptr<ExprNode> Parser::printStatement() {
-    consume(TokenType::LPAREN, "Expected '(' after 'print'");
-    std::unique_ptr<ExprNode> expr = expression();
-    consume(TokenType::RPAREN, "Expected ')' after expression");
-    return std::make_unique<PrintNode>(std::move(expr));
-}
+    // Handle consecutive `-` tokens
+    std::unique_ptr<ExprNode> node = std::make_unique<NodeType>(token, value);
 
-std::unique_ptr<ExprNode> Parser::expression()
-{
-    return logicalOr();
-}
+    while (current_token().type == TokenType::ARITHMETIC && current_token().value == "-") {
+        Token op = current_token();
+        advance();
 
-std::unique_ptr<ExprNode> Parser::logicalOr()
-{
-    std::unique_ptr<ExprNode> expr = logicalAnd();
-
-    while (match({ TokenType::LOGICAL_OR })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = logicalAnd();
-        expr = std::make_unique<BinaryExprNode>(std::move(expr), tokenTypeToString(op.type), std::move(right));
-    }
-
-    return expr;
-}
-
-std::unique_ptr<ExprNode> Parser::logicalAnd()
-{
-    std::unique_ptr<ExprNode> expr = equality();
-
-    while (match({ TokenType::LOGICAL_AND })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = equality();
-        expr = std::make_unique<BinaryExprNode>(std::move(expr), tokenTypeToString(op.type), std::move(right));
-    }
-
-    return expr;
-}
-
-std::unique_ptr<ExprNode> Parser::equality()
-{
-    std::unique_ptr<ExprNode> expr = comparison();
-
-    while (match({ TokenType::EQUAL_TO, TokenType::NOT_EQUAL })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = comparison();
-        expr = std::make_unique<BinaryExprNode>(std::move(expr), tokenTypeToString(op.type), std::move(right));
-    }
-
-    return expr;
-}
-
-std::unique_ptr<ExprNode> Parser::comparison()
-{
-    std::unique_ptr<ExprNode> expr = term();
-
-    while (match({ TokenType::LESS_THAN, TokenType::LESS_EQUAL, TokenType::GREATER_THAN, TokenType::GREATER_EQUAL })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = term();
-        expr = std::make_unique<BinaryExprNode>(std::move(expr), tokenTypeToString(op.type), std::move(right));
-    }
-
-    return expr;
-}
-
-std::unique_ptr<ExprNode> Parser::term()
-{
-    std::unique_ptr<ExprNode> expr = factor();
-
-    while (match({ TokenType::PLUS, TokenType::MINUS })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = factor();
-        expr = std::make_unique<BinaryExprNode>(std::move(expr), tokenTypeToString(op.type), std::move(right));
-    }
-
-    return expr;
-}
-
-std::unique_ptr<ExprNode> Parser::factor()
-{
-    std::unique_ptr<ExprNode> expr = unary();
-
-    while (match({ TokenType::MULTIPLY, TokenType::DIVIDE })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = unary();
-        expr = std::make_unique<BinaryExprNode>(std::move(expr), tokenTypeToString(op.type), std::move(right));
-    }
-
-    return expr;
-}
-
-std::unique_ptr<ExprNode> Parser::unary() {
-
-    if (match({ TokenType::MINUS, TokenType::NOT })) {
-        Token op = previous();
-        std::unique_ptr<ExprNode> right = unary();
-        return std::make_unique<UnaryExprNode>(tokenTypeToString(op.type), std::move(right));
-    }
-
-    return primary();
-}
-
-std::unique_ptr<ExprNode> Parser::primary() {
-    if (match({ TokenType::NUMBER })) {
-        // Convert string to double and create a number node
-        double value = std::stod(previous().value);
-        return std::make_unique<NumberNode>(value);
-    }
-
-    if (match({ TokenType::STRING })) {
-        // Create a string node based on the token value
-        std::string value = previous().value;
-        return std::make_unique<StringNode>(value);
-    }
-
-    if (match({ TokenType::FALSE, TokenType::TRUE })) {
-        // Create a boolean node based on the token type
-        bool value = previous().type == TokenType::TRUE;
-        return std::make_unique<BooleanNode>(value);
-    }
-
-    if (match({ TokenType::IDENTIFIER })) {
-        // Return a variable node based on the token value
-        std::string name = previous().value;
-        return std::make_unique<VariableNode>(name);
-    }
-
-    if (match({ TokenType::LPAREN })) {
-        // Parse the expression inside the parentheses
-
-        std::unique_ptr<ExprNode> expr = expression();
-        consume(TokenType::RPAREN, "Expected ')' after expression");
-        return expr;
-    }
-
-    throw std::runtime_error("Expected an expression");
-
-}
-
-void Parser::synchronize() {
-    advance(); // Skip the problematic token
-
-    while (!isAtEnd()) {
-        if (previous().type == TokenType::EOL) return; // Stop if the previous token was the end of a line
-
-        // Check if the next token marks the beginning of a new statement
-        switch (peek().type) {
-        case TokenType::EOL:  // End of a line
-        case TokenType::PRINT: // Print statement
-        case TokenType::PLUS:
-        case TokenType::MINUS:
-        case TokenType::MULTIPLY:
-        case TokenType::DIVIDE:
-        case TokenType::EQUAL_TO:
-        case TokenType::NOT_EQUAL:
-        case TokenType::LESS_THAN:
-        case TokenType::GREATER_THAN:
-        case TokenType::LESS_EQUAL:
-        case TokenType::GREATER_EQUAL:
-        case TokenType::LPAREN:
-        case TokenType::RPAREN:
-            return; // Safe points to start parsing again
-        default:
-            advance(); // Continue to skip tokens
+        if (current_token().type == TokenType::ARITHMETIC && current_token().value == "-") {
+            advance();
+            node = std::make_unique<BinaryExprNode>(op, std::move(node), "+", parse_primary());
+        }
+        else {
+            node = std::make_unique<BinaryExprNode>(op, std::move(node), "-", parse_primary());
         }
     }
+
+    return node;
 }
