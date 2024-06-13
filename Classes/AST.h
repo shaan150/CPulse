@@ -200,3 +200,92 @@ private:
     	std::unique_ptr<ExprNode> condition;
 		std::unique_ptr<BlockNode> block;
 };
+
+class ListInitNode : public ExprNode {
+public:
+    ListInitNode(const Token& token, const std::string& name, const std::string& elementType)
+        : ExprNode(token), name(name), elementType(elementType) {}
+
+    const std::string& getName() const { return name; }
+    const std::string& getElementType() const { return elementType; }
+
+private:
+    const std::string name;
+    const std::string elementType;
+};
+
+class ListAppendNode : public ExprNode {
+public:
+    ListAppendNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> value)
+		: ExprNode(token), listName(listName), value(std::move(value)) {}
+
+	const std::string& getListName() const { return listName; }
+	const std::unique_ptr<ExprNode>& getValue() const { return value; }
+
+private:
+    const std::string listName;
+	std::unique_ptr<ExprNode> value;
+};
+
+class ListIndexNode : public ExprNode {
+public:
+	ListIndexNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index)
+		: ExprNode(token), listName(listName), index(std::move(index)) {}
+
+	const std::string& getListName() const { return listName; }
+	const std::unique_ptr<ExprNode>& getIndex() const { return index; }
+
+private:
+    const std::string listName;
+	std::unique_ptr<ExprNode> index;
+};
+
+class ListLengthNode : public ExprNode {
+public: 
+    	ListLengthNode(const Token& token, const std::string& listName)
+		: ExprNode(token), listName(listName) {}
+
+	const std::string& getListName() const { return listName; }
+
+private:
+    const std::string listName;
+};
+
+class ListPopNode : public ExprNode {
+public:
+    ListPopNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index)
+		: ExprNode(token), listName(listName), index(std::move(index)) {}
+
+	const std::string& getListName() const { return listName; }
+	const std::unique_ptr<ExprNode>& getIndex() const { return index; }
+
+private:
+	const std::string listName;
+    std::unique_ptr<ExprNode> index;
+};
+
+class ListReplaceNode : public ExprNode {
+public:
+    ListReplaceNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index, std::unique_ptr<ExprNode> value)
+		: ExprNode(token), listName(listName), index(std::move(index)), value(std::move(value)) {}
+
+	const std::string& getListName() const { return listName; }
+	const std::unique_ptr<ExprNode>& getIndex() const { return index; }
+	const std::unique_ptr<ExprNode>& getValue() const { return value; }
+private:
+    const std::string listName;
+	std::unique_ptr<ExprNode> index;
+	std::unique_ptr<ExprNode> value;
+};
+
+class TypeCastNode : public ExprNode {
+public:
+    TypeCastNode(const Token& token, const std::string& type, std::unique_ptr<ExprNode> value)
+		: ExprNode(token), type(type), value(std::move(value)) {}
+
+	const std::string& getType() const { return type; }
+	const std::unique_ptr<ExprNode>& getValue() const { return value; }
+private:
+    const std::string type;
+	std::unique_ptr<ExprNode> value;
+};;

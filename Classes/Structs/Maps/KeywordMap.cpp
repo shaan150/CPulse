@@ -9,5 +9,9 @@ const std::unordered_map<std::string, TokenType> KeywordMap::map = {
 	{"while", TokenType::WHILE_LOOP},
 	{"return", TokenType::RETURN},
 	{"true", TokenType::BOOLEAN},
-	{"false", TokenType::BOOLEAN}
+	{"false", TokenType::BOOLEAN},
+	{"int", TokenType::TYPE},
+	{"double", TokenType::TYPE},
+	{"string", TokenType::TYPE},
+	{"bool", TokenType::TYPE}
 };

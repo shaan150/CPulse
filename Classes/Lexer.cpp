@@ -33,7 +33,7 @@ std::vector<Token> Lexer::tokenize() {
             continue;
         }
 
-        if ((std::isdigit(input[pos]) || input[pos] == '.') && !inComment && !inString) {
+        if ((std::isdigit(input[pos])) && !inComment && !inString) {
             tokens.push_back(readNumber());
             continue;
         }
@@ -109,9 +109,6 @@ Token Lexer::readNumber() {
     }
 
     std::string numberStr = input.substr(start, pos - start);
-    if (numberStr == ".") {
-        throw std::runtime_error("Syntax error: Lone decimal point is not a valid number at line " + std::to_string(line));
-    }
 
     if (decimalFound) {
 		return Token(TokenType::DOUBLE, numberStr, line, startColumn);

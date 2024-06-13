@@ -1,2 +1,0 @@
-true and
-or false

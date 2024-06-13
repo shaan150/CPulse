@@ -15,5 +15,8 @@ const std::unordered_map<char, TokenType> OperatorMap::map = {
     {'[', TokenType::LBRACKET},
     {']', TokenType::RBRACKET},
     {'{', TokenType::LBRACE},
-    {'}', TokenType::RBRACE}
+    {'}', TokenType::RBRACE},
+    {':', TokenType::COLON},
+    {',', TokenType::COMMA},
+    {'.', TokenType::METHOD_ACCESS }
 };

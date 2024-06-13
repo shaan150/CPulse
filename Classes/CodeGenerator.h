@@ -15,6 +15,7 @@ public:
 
 private:
     std::unordered_map<std::string, Value> variables;
+    
     void executeBlock(const BlockNode* blockNode);
     Value evaluate(const ExprNode* node);
     Value performBinaryOperation(auto binNode, const Value& left, const Value& right);
