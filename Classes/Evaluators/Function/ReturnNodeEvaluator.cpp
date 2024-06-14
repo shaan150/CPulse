@@ -13,10 +13,5 @@ Value evaluateReturnNode(CodeGenerator& generator, const ReturnNode* returnNode)
     // Evaluate the expression in the return statement
     Value returnValue = evaluate(returnNode->getValue().get(), generator);
 
-    // save the return value in the current function context
-    if (!generator.functionHandler->currentFunctionContext.empty()) {
-		generator.functionHandler->currentFunctionContext.top().returnValue = returnValue;
-	}
-
     return returnValue;
 }

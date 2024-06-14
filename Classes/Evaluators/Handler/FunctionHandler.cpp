@@ -2,6 +2,7 @@
 #include <Evaluator.h>
 #include <stdexcept>
 #include <ValueHelper.h>
+#include <iostream>
 
 void FunctionHandler::addFunction(const std::string& name, std::unique_ptr<Function> function) {
     functions[name] = std::move(function);
@@ -27,21 +28,23 @@ Value FunctionHandler::callFunction(const FunctionCallNode* functionCallNode, Co
         context.variables[params[i].name] = evaluate(args[i].get(), generator);
     }
     currentFunctionContext.push(context);
-
-    // Execute the function body
-    Value result = evaluate(function->getBody().get(), generator);
+    
+    Value result = std::monostate();
 
     // Validate return type
     if (function->getReturnType() != "void") {
         bool hasReturnStatement = false;
         for (const auto& statement : function->getBody()->getStatements()) {
             if (auto returnNode = dynamic_cast<ReturnNode*>(statement.get())) {
+                // evaluate the return statement
+                result = evaluate(returnNode->getValue().get(), generator);
+                // debug 
+                std::cout << "Return value: " << ValueHelper::asString(result) << std::endl;
+
                 hasReturnStatement = true;
-                std::string actualReturnType = ValueHelper::type(result);
-                if (function->getReturnType() != actualReturnType) {
-                    throw std::runtime_error("Type Error: Return type mismatch in function '" + functionCallNode->getName() + "'");
-                }
-            }
+            } else {
+				evaluate(statement.get(), generator);
+			}
         }
 
         if (!hasReturnStatement) {
