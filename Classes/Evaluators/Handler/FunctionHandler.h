@@ -1,11 +1,25 @@
-#ifndef FUNCTION_HANDLER_H
-#define FUNCTION_HANDLER_H
+#ifndef FUNCTIONHANDLER_H
+#define FUNCTIONHANDLER_H
 
-#include "CodeGenerator.h"
-#include "Value.h"
-#include <Evaluators/Function/FunctionNodeEvaluator.h>
+#include "AST.h"
+#include <Functions/FunctionContext.h>
+#include <Functions/Function.h>
+#include <stack>
 
-Value evaluateFunctionCallNode(CodeGenerator& generator, const FunctionCallNode* functionCallNode);
+class CodeGenerator; // Forward declaration
 
+class FunctionHandler {
+public:
+    void addFunction(const std::string& name, std::unique_ptr<Function> function);
+    Value callFunction(const FunctionCallNode* functionCallNode, CodeGenerator& generator);
 
-#endif // FUNCTION_HANDLER_H
+private:
+    std::unordered_map<std::string, std::unique_ptr<Function>> functions;
+    std::stack<FunctionContext> currentFunctionContext;
+
+    friend Value evaluateVariableNode(CodeGenerator& generator, const VariableNode* varNode);
+    friend Value evaluateAssignNode(CodeGenerator& generator, const AssignNode* assignNode);
+    friend Value evaluateReturnNode(CodeGenerator& generator, const ReturnNode* returnNode);
+};
+
+#endif // FUNCTIONHANDLER_H

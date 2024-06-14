@@ -1,4 +1,6 @@
 #include "IONodeEvaluator.h"
+#include "CodeGenerator.h"
+#include <iostream>
 
 Value evaluatePrintNode(CodeGenerator& generator, const PrintNode* prNode) {
     Value value = evaluate(prNode->getExpression().get(), generator);

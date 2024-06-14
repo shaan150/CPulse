@@ -23,9 +23,9 @@ void CPulse::processFile(const std::string& filePath, const std::string& title) 
         std::vector<Token> tokens = lexer.tokenize(); // Tokenize the entire content
 
         // print the tokens
-       /* for (const auto& token : tokens) {
+       for (const auto& token : tokens) {
 			std::cout << "Token: " << token.value << " Type: " << tokenTypeToString(token.type) << std::endl;
-		}*/
+		}
         CodeGenerator codeGen;
         Parser parser(tokens, codeGen);  // Initialize the parser with the tokens
         parser.parse();  // Parse the tokens
@@ -45,12 +45,13 @@ void CPulse::processFile(const std::string& filePath, const std::string& title) 
 int main() {
 
     CPulse cpulse;
-    cpulse.processFile("stage1_test.txt", "Test 1");
+    /*cpulse.processFile("stage1_test.txt", "Test 1");
     cpulse.processFile("stage2_test.txt", "Test 2");
     cpulse.processFile("stage3_test.txt", "Test 3");
     cpulse.processFile("stage4_test.txt", "Test 4");
     cpulse.processFile("stage5_test.txt", "Test 5");
-    cpulse.processFile("list_test.txt", "Test 6");
+    cpulse.processFile("list_test.txt", "Test 6");*/
+    cpulse.processFile("func_test.txt", "Test 7");
 
 
     return 0;

@@ -1,31 +1,24 @@
 #pragma once
-#include <variant>
 #include <string>
 #include <unordered_map>
-#include <stdexcept>
-#include <iostream>
-#include <stack>
 #include "AST.h"
 #include "Value.h"
-#include "Structs/Functions/Function.h"
-#include <Functions/FunctionContext.h>
 
-// Forward declaration to avoid cyclic dependency
-class CodeGenerator;
-
-#include "Evaluator.h"
-
+class FunctionHandler;
 
 class CodeGenerator {
 public:
     // Executes the AST and outputs the result
     void execute(const ExprNode* root);
 
+    // Constructor and Destructor
+    CodeGenerator();
+    ~CodeGenerator();
+
 
 private:
     std::unordered_map<std::string, Value> variables;
-    std::unordered_map<std::string, std::unique_ptr<Function>> functions;
-    std::stack<FunctionContext> currentFunctionContext;
+    std::unique_ptr<FunctionHandler> functionHandler;
     
     void executeBlock(const BlockNode* blockNode);
 
@@ -56,6 +49,8 @@ private:
     friend Value evaluateBlockNode(CodeGenerator& generator, const BlockNode* blockNode);
     friend Value evaluateTypeCastNode(CodeGenerator& generator, const TypeCastNode* typeCastNode);
     friend Value evaluateFunctionCallNode(CodeGenerator& generator, const FunctionCallNode* functionCallNode);
+    friend Value evaluateFunctionDefNode(CodeGenerator& generator, const FunctionDefNode* functionDefNode);
+    friend Value evaluateReturnNode(CodeGenerator& generator, const ReturnNode* returnNode);
 
     friend class FunctionNodeEvaluator;
 

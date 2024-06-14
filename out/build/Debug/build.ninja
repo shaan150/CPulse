@@ -185,6 +185,14 @@ build CMakeFiles\CPulse.dir\Classes\Evaluators\Handler\FunctionHandler.cpp.obj: 
   TARGET_COMPILE_PDB = CMakeFiles\CPulse.dir\
   TARGET_PDB = CPulse.pdb
 
+build CMakeFiles\CPulse.dir\Classes\Evaluators\Function\ReturnNodeEvaluator.cpp.obj: CXX_COMPILER__CPulse_unscanned_Debug S$:\Year$ 3\Language$ Design\CPulse\Classes\Evaluators\Function\ReturnNodeEvaluator.cpp || cmake_object_order_depends_target_CPulse
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /EHsc- /std:c++latest
+  INCLUDES = -I"S:\Year 3\Language Design\CPulse\Classes" -I"S:\Year 3\Language Design\CPulse\Classes\Enums" -I"S:\Year 3\Language Design\CPulse\Classes\Structs"
+  OBJECT_DIR = CMakeFiles\CPulse.dir
+  OBJECT_FILE_DIR = CMakeFiles\CPulse.dir\Classes\Evaluators\Function
+  TARGET_COMPILE_PDB = CMakeFiles\CPulse.dir\
+  TARGET_PDB = CPulse.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target CPulse
@@ -193,7 +201,7 @@ build CMakeFiles\CPulse.dir\Classes\Evaluators\Handler\FunctionHandler.cpp.obj: 
 #############################################
 # Link the executable CPulse.exe
 
-build CPulse.exe: CXX_EXECUTABLE_LINKER__CPulse_Debug CMakeFiles\CPulse.dir\CPulse.cpp.obj CMakeFiles\CPulse.dir\Classes\Lexer.cpp.obj CMakeFiles\CPulse.dir\Classes\Enums\TokenType.cpp.obj CMakeFiles\CPulse.dir\Classes\Parser\Parser.cpp.obj CMakeFiles\CPulse.dir\Classes\CodeGenerator.cpp.obj CMakeFiles\CPulse.dir\Classes\Structs\Maps\KeywordMap.cpp.obj CMakeFiles\CPulse.dir\Classes\Structs\Maps\OperatorMap.cpp.obj CMakeFiles\CPulse.dir\Classes\TypedVector.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Primitive\PrimitiveNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Variable\VariableNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\List\ListNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\ControlFlow\ControlFlowEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Expression\ExpressionNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\IO\IONodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Function\FunctionNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Handler\FunctionHandler.cpp.obj
+build CPulse.exe: CXX_EXECUTABLE_LINKER__CPulse_Debug CMakeFiles\CPulse.dir\CPulse.cpp.obj CMakeFiles\CPulse.dir\Classes\Lexer.cpp.obj CMakeFiles\CPulse.dir\Classes\Enums\TokenType.cpp.obj CMakeFiles\CPulse.dir\Classes\Parser\Parser.cpp.obj CMakeFiles\CPulse.dir\Classes\CodeGenerator.cpp.obj CMakeFiles\CPulse.dir\Classes\Structs\Maps\KeywordMap.cpp.obj CMakeFiles\CPulse.dir\Classes\Structs\Maps\OperatorMap.cpp.obj CMakeFiles\CPulse.dir\Classes\TypedVector.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Primitive\PrimitiveNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Variable\VariableNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\List\ListNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\ControlFlow\ControlFlowEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Expression\ExpressionNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\IO\IONodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Function\FunctionNodeEvaluator.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Handler\FunctionHandler.cpp.obj CMakeFiles\CPulse.dir\Classes\Evaluators\Function\ReturnNodeEvaluator.cpp.obj
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

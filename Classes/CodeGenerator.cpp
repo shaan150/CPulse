@@ -1,8 +1,22 @@
 #include "CodeGenerator.h"
+#include "Evaluators/Handler/FunctionHandler.h"
 #include <ValueHelper.h>
+#include <stdexcept>
+#include <iostream>
+#include <stack>
+#include <memory>
+#include <vector>
 
+CodeGenerator::CodeGenerator() {
+    functionHandler = std::make_unique<FunctionHandler>();
+}
+
+CodeGenerator::~CodeGenerator() {
+    // Destructor code if needed (unique_ptr will handle the deletion automatically)
+}
 
 void CodeGenerator::execute(const ExprNode* node) {
+    functionHandler = std::make_unique<FunctionHandler>();
     if (auto blockNode = dynamic_cast<const BlockNode*>(node)) {
         executeBlock(blockNode);
     }

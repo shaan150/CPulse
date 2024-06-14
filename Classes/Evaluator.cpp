@@ -1,4 +1,7 @@
 #include "Evaluator.h"
+#include <stdexcept>
+#include <Evaluators/Function/FunctionNodeEvaluator.h>
+#include <Evaluators/Function/ReturnNodeEvaluator.h>
 
 Value evaluate(const ExprNode* node, CodeGenerator& generator) {
     if (!node) {
@@ -65,9 +68,17 @@ Value evaluate(const ExprNode* node, CodeGenerator& generator) {
     else if (auto typeCastNode = dynamic_cast<const TypeCastNode*>(node)) {
         return evaluateTypeCastNode(generator, typeCastNode);
     }
+    else if (auto functionDefNode = dynamic_cast<const FunctionDefNode*>(node)) {
+         FunctionNodeEvaluator evaluator;
+         return evaluator.evaluateFunctionDefNode(&generator, functionDefNode);
+        }
     else if (auto functionCallNode = dynamic_cast<const FunctionCallNode*>(node)) {
-        return evaluateFunctionCallNode(generator, functionCallNode);
+         FunctionNodeEvaluator evaluator;
+         return evaluator.evaluateFunctionCallNode(&generator, functionCallNode);
     }
+    else if (auto returnNode = dynamic_cast<const ReturnNode*>(node)) {
+		return evaluateReturnNode(generator, returnNode);
+	}
 
     throw std::runtime_error("Syntax Error: Unsupported node type at line " + std::to_string(node->getToken().line));
 }

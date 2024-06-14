@@ -7,7 +7,6 @@ const std::unordered_map<std::string, TokenType> KeywordMap::map = {
 	{"if", TokenType::IF_CONDITION},
 	{"else", TokenType::ELSE_CONDITION},
 	{"while", TokenType::WHILE_LOOP},
-	{"return", TokenType::RETURN},
 	{"true", TokenType::BOOLEAN},
 	{"false", TokenType::BOOLEAN},
 	{"int", TokenType::TYPE},
@@ -15,5 +14,6 @@ const std::unordered_map<std::string, TokenType> KeywordMap::map = {
 	{"string", TokenType::TYPE},
 	{"bool", TokenType::TYPE},
 	{"void", TokenType::TYPE},
-	{"func", TokenType::FUNCTION}
+	{"func", TokenType::FUNCTION},
+	{"return", TokenType::RETURN}
 };

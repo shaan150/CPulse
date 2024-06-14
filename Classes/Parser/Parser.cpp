@@ -62,6 +62,9 @@ std::unique_ptr<ExprNode> Parser::parse_statement() {
     }
     else if (token.type == TokenType::WHILE_LOOP) {
         return parse_while_statement();
+    } 
+    else if (token.type == TokenType::RETURN) {
+        return parse_return_statement();
     }
 
     else {
@@ -69,6 +72,14 @@ std::unique_ptr<ExprNode> Parser::parse_statement() {
         expect(TokenType::EOL);
         return expr;
     }
+}
+
+std::unique_ptr<ExprNode> Parser::parse_return_statement() {
+    Token returnToken = current_token(); // This should be the 'return' token
+    advance();
+    auto value = parse_expression(); // Assuming you have a parse_expression function
+    expect(TokenType::EOL);
+    return std::make_unique<ReturnNode>(returnToken, std::move(value));
 }
 
 std::unique_ptr<ExprNode> Parser::parse_print_statement() {
@@ -241,6 +252,10 @@ std::unique_ptr<ExprNode> Parser::parse_primary() {
         return nullptr;
     }
 
+    if (current_token().type == TokenType::FUNCTION) {
+        return parse_function_definition();
+    }
+
     std::string line = std::to_string(token.line);
     throw std::runtime_error("Syntax Error: Invalid Token " + token.value + " at line " + line);
 }
@@ -325,7 +340,7 @@ std::unique_ptr<ExprNode> Parser::identifier_handler(Token& token, std::string& 
         auto index = parse_expression();
         expect(TokenType::RBRACKET);
         return std::make_unique<ListIndexNode>(token, identifier, std::move(index));
-    }
+    } 
 
     return handle_functions(identifier);
 
@@ -337,24 +352,36 @@ std::unique_ptr<ExprNode> Parser::handle_functions(std::string& identifier) {
     if (token.type == TokenType::LPARENTHESIS) {
         // Function call
         advance();
-        auto arg = parse_expression();
+
+        std::vector<std::unique_ptr<ExprNode>> args;
+        if (current_token().type != TokenType::RPARENTHESIS) {
+            while (true) {
+                args.push_back(parse_expression());
+                if (current_token().type == TokenType::RPARENTHESIS) {
+                    break;
+                }
+                expect(TokenType::COMMA);
+            }
+        }
         expect(TokenType::RPARENTHESIS);
+
         if (identifier == "print") {
-            return std::make_unique<PrintNode>(token, std::move(arg));
+            return std::make_unique<PrintNode>(token, std::move(args[0])); // Assuming print takes only one argument
         }
         else if (identifier == "input") {
             // create a print node to print the value
-            auto printNode = std::make_unique<PrintNode>(token, std::move(arg));
+            auto printNode = std::make_unique<PrintNode>(token, std::move(args[0])); // Assuming input takes only one argument
             return std::make_unique<InputNode>(token, std::move(printNode));
         }
         else if (identifier == "int" || identifier == "double" || identifier == "string" || identifier == "bool") {
-            return std::make_unique<TypeCastNode>(token, identifier, std::move(arg));
+            return std::make_unique<TypeCastNode>(token, identifier, std::move(args[0])); // Assuming type casts take only one argument
         }
-        return std::make_unique<FunctionCallNode>(token, identifier, std::move(arg));
+        return std::make_unique<FunctionCallNode>(token, identifier, std::move(args));
     }
 
     return std::make_unique<VariableNode>(token, identifier);
 }
+
 
 template <typename NodeType, typename ValueType>
 std::unique_ptr<ExprNode> Parser::parse_numeric_node(const Token& token, ValueType value) {
@@ -378,4 +405,64 @@ std::unique_ptr<ExprNode> Parser::parse_numeric_node(const Token& token, ValueTy
 
     return node;
 
+}
+
+std::unique_ptr<ExprNode> Parser::parse_function_definition() {
+    Token funcToken = current_token(); // This should be the 'func' token
+    advance();
+
+    // Parse return type
+    expect(TokenType::COLON);
+    Token returnTypeToken = current_token();
+    expect(TokenType::TYPE);
+    std::string returnType = returnTypeToken.value;
+
+    // Parse function name
+    Token nameToken = current_token();
+    expect(TokenType::IDENTIFIER);
+    std::string functionName = nameToken.value;
+
+    // Parse parameters
+    expect(TokenType::LPARENTHESIS);
+    std::vector<std::pair<std::string, std::string>> parameters;
+    if (current_token().type != TokenType::RPARENTHESIS) {
+        while (true) {
+            Token paramNameToken = current_token();
+            expect(TokenType::IDENTIFIER);
+            std::string paramName = paramNameToken.value;
+
+            expect(TokenType::COLON);
+            Token paramTypeToken = current_token();
+            expect(TokenType::TYPE);
+            std::string paramType = paramTypeToken.value;
+
+            parameters.emplace_back(paramName, paramType);
+
+            if (current_token().type == TokenType::RPARENTHESIS) {
+                break;
+            }
+            expect(TokenType::COMMA);
+        }
+    }
+    expect(TokenType::RPARENTHESIS);
+
+    // Parse function body
+    expect(TokenType::LBRACE);
+    std::vector<std::unique_ptr<ExprNode>> statements;
+    bool hasReturnStatement = false;
+    while (current_token().type != TokenType::RBRACE) {
+        auto statement = parse_statement();
+        if (dynamic_cast<ReturnNode*>(statement.get()) != nullptr) {
+            hasReturnStatement = true;
+        }
+        statements.push_back(std::move(statement));
+    }
+    expect(TokenType::RBRACE);
+
+    if (returnType != "void" && !hasReturnStatement) {
+        throw std::runtime_error("Syntax Error: Missing return statement in function '" + functionName + "' at line " + std::to_string(funcToken.line));
+    }
+
+    auto body = std::make_unique<BlockNode>(funcToken, std::move(statements));
+    return std::make_unique<FunctionDefNode>(funcToken, functionName, returnType, std::move(parameters), std::move(body));
 }

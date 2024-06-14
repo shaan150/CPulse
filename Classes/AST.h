@@ -146,11 +146,18 @@ private:
     std::unique_ptr<ExprNode> expression; // The expression to print
 };
 
-// Represents a block node with a list of statements
 class BlockNode : public ExprNode {
 public:
-    explicit BlockNode(const Token& token, std::vector<std::unique_ptr<ExprNode>> statements)
+    BlockNode(const Token& token, std::vector<std::unique_ptr<ExprNode>> statements)
         : ExprNode(token), statements(std::move(statements)) {}
+
+    // Delete copy constructor and copy assignment operator
+    BlockNode(const BlockNode&) = delete;
+    BlockNode& operator=(const BlockNode&) = delete;
+
+    // Default move constructor and move assignment operator
+    BlockNode(BlockNode&&) = default;
+    BlockNode& operator=(BlockNode&&) = default;
 
     const std::vector<std::unique_ptr<ExprNode>>& getStatements() const { return statements; }
 
@@ -161,15 +168,15 @@ private:
 // Represents a function call node with a name and arguments
 class FunctionCallNode : public ExprNode {
 public:
-    explicit FunctionCallNode(const Token& token, const std::string name, std::unique_ptr<ExprNode> arg)
-        : ExprNode(token), name(std::move(name)), arg(std::move(arg)) {}
+    FunctionCallNode(const Token& token, const std::string& name, std::vector<std::unique_ptr<ExprNode>> args)
+        : ExprNode(token), name(name), args(std::move(args)) {}
 
-    const std::string getName() const { return name; }
-    const std::unique_ptr<ExprNode>& getArg() const { return arg; }
+    const std::string& getName() const { return name; }
+    const std::vector<std::unique_ptr<ExprNode>>& getArgs() const { return args; }
 
 private:
     const std::string name;
-    std::unique_ptr<ExprNode> arg;
+    std::vector<std::unique_ptr<ExprNode>> args;
 };
 
 // Represents an if-statement node
@@ -288,4 +295,41 @@ public:
 private:
     const std::string type;
     std::unique_ptr<ExprNode> value;
-};;
+};
+
+class FunctionDefNode : public ExprNode {
+public:
+    FunctionDefNode(const Token& token, const std::string& name, const std::string& returnType, std::vector<std::pair<std::string, std::string>> parameters, std::unique_ptr<BlockNode> body)
+        : ExprNode(token), name(name), returnType(returnType), parameters(std::move(parameters)), body(std::move(body)) {}
+
+    // Delete copy constructor and copy assignment operator
+    FunctionDefNode(const FunctionDefNode&) = delete;
+    FunctionDefNode& operator=(const FunctionDefNode&) = delete;
+
+    // Default move constructor and move assignment operator
+    FunctionDefNode(FunctionDefNode&&) = default;
+    FunctionDefNode& operator=(FunctionDefNode&&) = default;
+
+    const std::string& getName() const { return name; }
+    const std::string& getReturnType() const { return returnType; }
+    const std::vector<std::pair<std::string, std::string>>& getParameters() const { return parameters; }
+    const std::unique_ptr<BlockNode>& getBody() const { return body; } // Return by reference for modification
+
+private:
+    std::string name;
+    std::string returnType;
+    std::vector<std::pair<std::string, std::string>> parameters;
+    std::unique_ptr<BlockNode> body;
+};
+
+// Represents a return statement (e.g., return expr;)
+class ReturnNode : public ExprNode {
+public:
+    ReturnNode(const Token& token, std::unique_ptr<ExprNode> value)
+        : ExprNode(token), value(std::move(value)) {}
+
+    const std::unique_ptr<ExprNode>& getValue() const { return value; }
+
+private:
+    std::unique_ptr<ExprNode> value;
+};
