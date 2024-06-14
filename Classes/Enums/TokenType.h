@@ -11,6 +11,7 @@ enum class TokenType {
     TYPE,
     COLON,
     COMMA,
+    FUNCTION,
     METHOD_ACCESS,
     LPARENTHESIS,
     RPARENTHESIS,

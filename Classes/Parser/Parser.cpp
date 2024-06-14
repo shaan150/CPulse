@@ -1,3 +1,4 @@
+
 // parser.cpp
 
 #include "Parser.h"
@@ -25,9 +26,9 @@ void Parser::expect(TokenType type) {
 
     if (current_token().type != type) {
         if (type == TokenType::COMMA) {
-			std::string line = std::to_string(current_token().line);
-			throw std::runtime_error("Syntax Error: Expected Additional Argument At Line " + line);
-		}
+            std::string line = std::to_string(current_token().line);
+            throw std::runtime_error("Syntax Error: Expected Additional Argument At Line " + line);
+        }
         std::string line = std::to_string(current_token().line);
         throw std::runtime_error("Syntax Error: Unexpected Token " + current_token().value + " at line " + line +
             "\nExpected Type: " + tokenTypeToString(type));
@@ -60,8 +61,8 @@ std::unique_ptr<ExprNode> Parser::parse_statement() {
         return parse_if_statement();
     }
     else if (token.type == TokenType::WHILE_LOOP) {
-		return parse_while_statement();
-	}
+        return parse_while_statement();
+    }
 
     else {
         auto expr = parse_expression();
@@ -233,12 +234,12 @@ std::unique_ptr<ExprNode> Parser::parse_primary() {
 
     if (token.type == TokenType::TYPE) {
         advance();
-		return handle_functions(token.value);
-	}
+        return handle_functions(token.value);
+    }
 
     if (token.type == TokenType::EOFI || token.type == TokenType::EOL) {
-		return nullptr;
-	}
+        return nullptr;
+    }
 
     std::string line = std::to_string(token.line);
     throw std::runtime_error("Syntax Error: Invalid Token " + token.value + " at line " + line);
@@ -273,14 +274,14 @@ std::unique_ptr<ExprNode> Parser::identifier_handler(Token& token, std::string& 
                     return std::make_unique<ListInitNode>(token, identifier, type);
                 }
             }
-        } 
+        }
         else {
             // It's an assignment
             auto value = parse_expression();
             return std::make_unique<AssignNode>(token, identifier, std::move(value));
         }
     }
-    else if (newToken.type == TokenType::METHOD_ACCESS) 
+    else if (newToken.type == TokenType::METHOD_ACCESS)
     {
         advance();
         newToken = current_token();
@@ -339,16 +340,16 @@ std::unique_ptr<ExprNode> Parser::handle_functions(std::string& identifier) {
         auto arg = parse_expression();
         expect(TokenType::RPARENTHESIS);
         if (identifier == "print") {
-			return std::make_unique<PrintNode>(token, std::move(arg));
-		}
+            return std::make_unique<PrintNode>(token, std::move(arg));
+        }
         else if (identifier == "input") {
             // create a print node to print the value
             auto printNode = std::make_unique<PrintNode>(token, std::move(arg));
             return std::make_unique<InputNode>(token, std::move(printNode));
         }
         else if (identifier == "int" || identifier == "double" || identifier == "string" || identifier == "bool") {
-			return std::make_unique<TypeCastNode>(token, identifier, std::move(arg));
-		}
+            return std::make_unique<TypeCastNode>(token, identifier, std::move(arg));
+        }
         return std::make_unique<FunctionCallNode>(token, identifier, std::move(arg));
     }
 

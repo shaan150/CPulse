@@ -13,5 +13,7 @@ const std::unordered_map<std::string, TokenType> KeywordMap::map = {
 	{"int", TokenType::TYPE},
 	{"double", TokenType::TYPE},
 	{"string", TokenType::TYPE},
-	{"bool", TokenType::TYPE}
+	{"bool", TokenType::TYPE},
+	{"void", TokenType::TYPE},
+	{"func", TokenType::FUNCTION}
 };

@@ -35,8 +35,8 @@ public:
 
 private:
     std::unique_ptr<ExprNode> right;
-	const std::string op;
-	std::unique_ptr<ExprNode> left;
+    const std::string op;
+    std::unique_ptr<ExprNode> left;
 };
 
 // Represents a unary operation (e.g., negation).
@@ -51,13 +51,13 @@ public:
 private:
     std::unique_ptr<ExprNode> operand;
     const std::string op;
-    
+
 };
 
 // Represents Double literals (e.g. "3.14").
 class DoubleNode : public ExprNode {
 public:
-    explicit DoubleNode(const Token& token, const double value) : ExprNode(token), value(value){}
+    explicit DoubleNode(const Token& token, const double value) : ExprNode(token), value(value) {}
 
     const double getValue() const { return value; }
 
@@ -68,9 +68,9 @@ private:
 // Represents Integer literals (e.g., "123").
 class IntegerNode : public ExprNode {
 public:
-	explicit IntegerNode(const Token& token, const int value) : ExprNode(token), value(value) {}
+    explicit IntegerNode(const Token& token, const int value) : ExprNode(token), value(value) {}
 
-	const int getValue() const { return value; }
+    const int getValue() const { return value; }
 private:
     const int value;
 };
@@ -120,7 +120,7 @@ public:
 
 private:
     const std::string name;
-	std::unique_ptr<ExprNode> value;
+    std::unique_ptr<ExprNode> value;
 };
 
 // Represents a function node with a name
@@ -161,15 +161,15 @@ private:
 // Represents a function call node with a name and arguments
 class FunctionCallNode : public ExprNode {
 public:
-	explicit FunctionCallNode(const Token& token, const std::string name, std::unique_ptr<ExprNode> arg)
-		: ExprNode(token), name(std::move(name)), arg(std::move(arg)) {}
+    explicit FunctionCallNode(const Token& token, const std::string name, std::unique_ptr<ExprNode> arg)
+        : ExprNode(token), name(std::move(name)), arg(std::move(arg)) {}
 
-	const std::string getName() const { return name; }
-	const std::unique_ptr<ExprNode>& getArg() const { return arg; }
+    const std::string getName() const { return name; }
+    const std::unique_ptr<ExprNode>& getArg() const { return arg; }
 
 private:
-        const std::string name;
-        std::unique_ptr<ExprNode> arg;
+    const std::string name;
+    std::unique_ptr<ExprNode> arg;
 };
 
 // Represents an if-statement node
@@ -191,14 +191,14 @@ private:
 // Represents a while loop node
 class WhileNode : public ExprNode {
 public:
-    	WhileNode(const Token& token, std::unique_ptr<ExprNode> condition, std::unique_ptr<BlockNode> block)
-            		: ExprNode(token), condition(std::move(condition)), block(std::move(block)) {}
-        
-        const std::unique_ptr<ExprNode>& getCondition() const { return condition; }
-        const std::unique_ptr<BlockNode>& getBlock() const { return block; };
+    WhileNode(const Token& token, std::unique_ptr<ExprNode> condition, std::unique_ptr<BlockNode> block)
+        : ExprNode(token), condition(std::move(condition)), block(std::move(block)) {}
+
+    const std::unique_ptr<ExprNode>& getCondition() const { return condition; }
+    const std::unique_ptr<BlockNode>& getBlock() const { return block; };
 private:
-    	std::unique_ptr<ExprNode> condition;
-		std::unique_ptr<BlockNode> block;
+    std::unique_ptr<ExprNode> condition;
+    std::unique_ptr<BlockNode> block;
 };
 
 class ListInitNode : public ExprNode {
@@ -217,35 +217,35 @@ private:
 class ListAppendNode : public ExprNode {
 public:
     ListAppendNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> value)
-		: ExprNode(token), listName(listName), value(std::move(value)) {}
+        : ExprNode(token), listName(listName), value(std::move(value)) {}
 
-	const std::string& getListName() const { return listName; }
-	const std::unique_ptr<ExprNode>& getValue() const { return value; }
+    const std::string& getListName() const { return listName; }
+    const std::unique_ptr<ExprNode>& getValue() const { return value; }
 
 private:
     const std::string listName;
-	std::unique_ptr<ExprNode> value;
+    std::unique_ptr<ExprNode> value;
 };
 
 class ListIndexNode : public ExprNode {
 public:
-	ListIndexNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index)
-		: ExprNode(token), listName(listName), index(std::move(index)) {}
+    ListIndexNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index)
+        : ExprNode(token), listName(listName), index(std::move(index)) {}
 
-	const std::string& getListName() const { return listName; }
-	const std::unique_ptr<ExprNode>& getIndex() const { return index; }
+    const std::string& getListName() const { return listName; }
+    const std::unique_ptr<ExprNode>& getIndex() const { return index; }
 
 private:
     const std::string listName;
-	std::unique_ptr<ExprNode> index;
+    std::unique_ptr<ExprNode> index;
 };
 
 class ListLengthNode : public ExprNode {
-public: 
-    	ListLengthNode(const Token& token, const std::string& listName)
-		: ExprNode(token), listName(listName) {}
+public:
+    ListLengthNode(const Token& token, const std::string& listName)
+        : ExprNode(token), listName(listName) {}
 
-	const std::string& getListName() const { return listName; }
+    const std::string& getListName() const { return listName; }
 
 private:
     const std::string listName;
@@ -254,38 +254,38 @@ private:
 class ListPopNode : public ExprNode {
 public:
     ListPopNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index)
-		: ExprNode(token), listName(listName), index(std::move(index)) {}
+        : ExprNode(token), listName(listName), index(std::move(index)) {}
 
-	const std::string& getListName() const { return listName; }
-	const std::unique_ptr<ExprNode>& getIndex() const { return index; }
+    const std::string& getListName() const { return listName; }
+    const std::unique_ptr<ExprNode>& getIndex() const { return index; }
 
 private:
-	const std::string listName;
+    const std::string listName;
     std::unique_ptr<ExprNode> index;
 };
 
 class ListReplaceNode : public ExprNode {
 public:
     ListReplaceNode(const Token& token, const std::string& listName, std::unique_ptr<ExprNode> index, std::unique_ptr<ExprNode> value)
-		: ExprNode(token), listName(listName), index(std::move(index)), value(std::move(value)) {}
+        : ExprNode(token), listName(listName), index(std::move(index)), value(std::move(value)) {}
 
-	const std::string& getListName() const { return listName; }
-	const std::unique_ptr<ExprNode>& getIndex() const { return index; }
-	const std::unique_ptr<ExprNode>& getValue() const { return value; }
+    const std::string& getListName() const { return listName; }
+    const std::unique_ptr<ExprNode>& getIndex() const { return index; }
+    const std::unique_ptr<ExprNode>& getValue() const { return value; }
 private:
     const std::string listName;
-	std::unique_ptr<ExprNode> index;
-	std::unique_ptr<ExprNode> value;
+    std::unique_ptr<ExprNode> index;
+    std::unique_ptr<ExprNode> value;
 };
 
 class TypeCastNode : public ExprNode {
 public:
     TypeCastNode(const Token& token, const std::string& type, std::unique_ptr<ExprNode> value)
-		: ExprNode(token), type(type), value(std::move(value)) {}
+        : ExprNode(token), type(type), value(std::move(value)) {}
 
-	const std::string& getType() const { return type; }
-	const std::unique_ptr<ExprNode>& getValue() const { return value; }
+    const std::string& getType() const { return type; }
+    const std::unique_ptr<ExprNode>& getValue() const { return value; }
 private:
     const std::string type;
-	std::unique_ptr<ExprNode> value;
+    std::unique_ptr<ExprNode> value;
 };;

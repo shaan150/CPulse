@@ -10,6 +10,7 @@ std::string tokenTypeToString(TokenType type)
         case TokenType::TYPE: return "TYPE";
         case TokenType::COLON: return "COLON";
         case TokenType::COMMA: return "COMMA";
+        case TokenType::FUNCTION: return "FUNCTION";
         case TokenType::METHOD_ACCESS: return "METHOD_ACCESS";
         case TokenType::LPARENTHESIS: return "LPARENTHESIS";
         case TokenType::RPARENTHESIS: return "RPARENTHESIS";
