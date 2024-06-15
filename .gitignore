@@ -9,3 +9,5 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+.vscode/launch.json
+build/.cmake/api/v1/query/client-vscode/query.json

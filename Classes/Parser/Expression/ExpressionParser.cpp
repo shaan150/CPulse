@@ -12,8 +12,12 @@ std::unique_ptr<ExprNode> ExpressionParser::parse_expression(Parser& parser) {
         std::string opValue = op.value;
         parser.advance();
 
+        // Define a set of possible initial operators
+        static const std::unordered_set<std::string> initialOperators = {"!", "=", "<", ">"};
+
         // Check for operators like '!=' and '=='
-        if ((opValue == "!" || opValue == "=" || opValue == "<" || opValue == ">") && parser.current_token().type == TokenType::EQUAL) {
+        if (initialOperators.find(opValue) != initialOperators.end() && 
+            parser.current_token().type == TokenType::EQUAL) {
             opValue += parser.current_token().value;
             parser.advance();
         }
