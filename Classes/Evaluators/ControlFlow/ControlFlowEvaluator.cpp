@@ -17,6 +17,8 @@ Value evaluateWhileNode(CodeGenerator& generator, const WhileNode* whileNode) {
     while (ValueHelper::asBool(evaluate(whileNode->getCondition().get(), generator))) {
         for (const auto& statement : whileNode->getBlock()->getStatements()) {
             evaluate(statement.get(), generator);
+            auto condition = evaluate(whileNode->getCondition().get(), generator);
+            bool isTrue = ValueHelper::asBool(condition);
             if (!ValueHelper::asBool(evaluate(whileNode->getCondition().get(), generator))) {
                 break;
             }

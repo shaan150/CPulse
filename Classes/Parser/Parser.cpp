@@ -62,7 +62,7 @@ std::unique_ptr<ExprNode> Parser::parse_statement() {
     }
     else if (token.type == TokenType::WHILE_LOOP) {
         return parse_while_statement();
-    } 
+    }
     else if (token.type == TokenType::RETURN) {
         return parse_return_statement();
     }
@@ -205,7 +205,7 @@ std::unique_ptr<ExprNode> Parser::parse_factor() {
         return node;
     }
 
-    if (current_token().type == TokenType::LOGICAL || current_token().type == TokenType::COMPARISON || current_token().value == "-") {
+    if (current_token().type == TokenType::LOGICAL || current_token().type == TokenType::COMPARISON || (current_token().value == "-" && current_token().type == TokenType::ARITHMETIC)) {
         Token op = current_token();
         advance();
         auto operand = parse_factor();
@@ -340,7 +340,7 @@ std::unique_ptr<ExprNode> Parser::identifier_handler(Token& token, std::string& 
         auto index = parse_expression();
         expect(TokenType::RBRACKET);
         return std::make_unique<ListIndexNode>(token, identifier, std::move(index));
-    } 
+    }
 
     return handle_functions(identifier);
 

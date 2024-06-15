@@ -45,13 +45,7 @@ void CPulse::processFile(const std::string& filePath, const std::string& title) 
 int main() {
 
     CPulse cpulse;
-    /*cpulse.processFile("stage1_test.txt", "Test 1");
-    cpulse.processFile("stage2_test.txt", "Test 2");
-    cpulse.processFile("stage3_test.txt", "Test 3");
-    cpulse.processFile("stage4_test.txt", "Test 4");
-    cpulse.processFile("stage5_test.txt", "Test 5");
-    cpulse.processFile("list_test.txt", "Test 6");*/
-    cpulse.processFile("func_test.txt", "Test 7");
+    cpulse.processFile("stage4_test.txt", "Test 1");
 
 
     return 0;

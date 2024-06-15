@@ -47,11 +47,11 @@ Value CodeGenerator::performBinaryOperation(const BinaryExprNode* binNode, const
             return performArithmeticOperation(token, op, ValueHelper::asInt(left), ValueHelper::asInt(right));
         }
         else if (ValueHelper::isDouble(left) && ValueHelper::isInt(right)) {
-			return performArithmeticOperation(token, op, ValueHelper::asDouble(left), ValueHelper::asInt(right));
-		}
+            return performArithmeticOperation(token, op, ValueHelper::asDouble(left), ValueHelper::asInt(right));
+        }
         else if (ValueHelper::isInt(left) && ValueHelper::isDouble(right)) {
-			return performArithmeticOperation(token, op, ValueHelper::asInt(left), ValueHelper::asDouble(right));
-		}
+            return performArithmeticOperation(token, op, ValueHelper::asInt(left), ValueHelper::asDouble(right));
+        }
         else if (ValueHelper::isString(left) && ValueHelper::isString(right)) {
             return performStringOperation(token, op, left, right);
         }
@@ -61,6 +61,9 @@ Value CodeGenerator::performBinaryOperation(const BinaryExprNode* binNode, const
         else if (ValueHelper::isString(left) && ValueHelper::isDouble(right)) {
             return performStringOperation(token, op, left, right);
         }
+        else if (ValueHelper::isString(left) && ValueHelper::isBool(right)) {
+			return performStringOperation(token, op, left, right);
+		}
         else {
             throw std::runtime_error("Arithmetic Operation Error: Unsupported operation " + op + " with types " + ValueHelper::type(left)
                 + " and " + ValueHelper::type(right) + " at line " + line);
@@ -73,9 +76,7 @@ Value CodeGenerator::performBinaryOperation(const BinaryExprNode* binNode, const
     }
 
     if (token.type == TokenType::LOGICAL) {
-        if (std::holds_alternative<bool>(left) && std::holds_alternative<bool>(right)) {
-            return performLogicalOperation(token, op, std::get<bool>(left), std::get<bool>(right));
-        }
+       return performLogicalOperation(token, op, left, right);
     }
 
     throw std::runtime_error("Arithmetic Operation Error: Type mismatch or unsupported operation " + op + " at line " + line);
@@ -92,6 +93,10 @@ Value CodeGenerator::performArithmeticOperation(const Token token, const std::st
         if (right == 0) throw std::runtime_error("Arithmetic Operation Error: Division by zero at line " + line);
         result = left / right;
     }
+    else if (op == "%") {
+		if (right == 0) throw std::runtime_error("Arithmetic Operation Error: Modulo by zero at line " + line);
+		result = std::fmod(left, right);
+	}
     else {
         throw std::runtime_error("Arithmetic Operation Error: Invalid Operator " + op + " at line " + line);
     }
@@ -105,9 +110,9 @@ Value CodeGenerator::performArithmeticOperation(const Token token, const std::st
 }
 
 Value CodeGenerator::performStringOperation(const Token token, const std::string& op, const Value& left, const Value& right) {
-	std::string line = std::to_string(token.line);
-	if (op == "+") return ValueHelper::asString(left) + ValueHelper::asString(right);
-	throw std::runtime_error("String Operation Error: Invalid Operator " + op + " at line " + line);
+    std::string line = std::to_string(token.line);
+    if (op == "+") return ValueHelper::asString(left) + ValueHelper::asString(right);
+    throw std::runtime_error("String Operation Error: Invalid Operator " + op + " at line " + line);
 }
 
 Value CodeGenerator::performComparisonOperation(const Token& token, const std::string& op, const Value& left, const Value& right) {
@@ -123,7 +128,7 @@ Value CodeGenerator::performComparisonOperation(const Token& token, const std::s
         if (op == "<=") return l <= r;
         if (op == ">") return l > r;
         if (op == ">=") return l >= r;
-	}
+    }
     else {
         if (op == "==") return left == right;
         if (op == "!=") return left != right;
@@ -131,10 +136,37 @@ Value CodeGenerator::performComparisonOperation(const Token& token, const std::s
     throw std::runtime_error("Comparison Operation Error: Unsupported comparison operator " + op + " at line " + line);
 }
 
-Value CodeGenerator::performLogicalOperation(const Token token, const std::string& op, bool left, bool right) {
+Value CodeGenerator::performLogicalOperation(const Token token, const std::string& op, const Value& left, const Value& right) {
     std::string line = std::to_string(token.line);
-    if (op == "and") return left && right;
-    if (op == "or") return left || right;
+
+    bool leftBool;
+    bool rightBool;
+
+    // Check for direct boolean types
+    if (std::holds_alternative<bool>(left) && std::holds_alternative<bool>(right)) {
+        leftBool = std::get<bool>(left);
+        rightBool = std::get<bool>(right);
+    }
+    // Check for string representations of boolean values
+    else if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right)) {
+        leftBool = (std::get<std::string>(left) == "true");
+        rightBool = (std::get<std::string>(right) == "true");
+    }
+    // Mixed case: one boolean and one string
+    else if (std::holds_alternative<std::string>(left) && std::holds_alternative<bool>(right)) {
+        leftBool = (std::get<std::string>(left) == "true");
+        rightBool = std::get<bool>(right);
+    }
+    else if (std::holds_alternative<bool>(left) && std::holds_alternative<std::string>(right)) {
+        leftBool = std::get<bool>(left);
+        rightBool = (std::get<std::string>(right) == "true");
+    }
+    else {
+        throw std::runtime_error("Logical Operation Error: Type mismatch or unsupported operation " + op + " at line " + line);
+    }
+
+    if (op == "and") return leftBool && rightBool;
+    if (op == "or") return leftBool || rightBool;
 
     throw std::runtime_error("Logical Operation Error: Unsupported logical operator " + op + " at line " + line);
 }

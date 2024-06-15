@@ -65,7 +65,10 @@ struct ValueHelper {
             }
             else if (std::holds_alternative<double>(value)) {
                 return std::to_string(asDouble(value));
-            }
+            } 
+            else if (std::holds_alternative<bool>(value)) {
+				return std::get<bool>(value) ? "true" : "false";
+			}
         }
         catch (const std::bad_variant_access&) {
             // Handle bad_variant_access exceptions by returning an empty string

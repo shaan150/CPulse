@@ -27,6 +27,7 @@ private:
     Value performStringOperation(const Token token, const std::string& op, const Value& left, const Value& right);
     Value performComparisonOperation(const Token& token, const std::string& op, const Value& left, const Value& right);
     Value performLogicalOperation(const Token token, const std::string& op, bool left, bool right);
+    Value performLogicalOperation(const Token token, const std::string& op, const Value& left, const Value& right);
     Value performUnaryOperation(const Token& token, const std::string& op, const Value& operand);
     void printValue(const Value& value);
 
