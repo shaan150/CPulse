@@ -1,23 +1,26 @@
 #include "ArithmeticOperations.h"
 
-Value ArithmeticOperations::performArithmeticOperation(const Token& token, const std::string& op, const double left, const double right) {
-    std::string line = std::to_string(token.line);
-    double result;
+const std::unordered_map<std::string, std::function<double(double, double)>> ArithmeticOperations::operations = {
+    {"+", [](double a, double b) { return a + b; }},
+    {"-", [](double a, double b) { return a - b; }},
+    {"*", [](double a, double b) { return a * b; }},
+    {"/", [](double a, double b) { 
+        if (b == 0) throw std::runtime_error("Arithmetic Operation Error: Division by zero");
+        return a / b; 
+    }},
+    {"%", [](double a, double b) { 
+        if (b == 0) throw std::runtime_error("Arithmetic Operation Error: Modulo by zero");
+        return std::fmod(a, b); 
+    }}
+};
 
-    if (op == "+") result = left + right;
-    else if (op == "-") result = left - right;
-    else if (op == "*") result = left * right;
-    else if (op == "/") {
-        if (right == 0) throw std::runtime_error("Arithmetic Operation Error: Division by zero at line " + line);
-        result = left / right;
+Value ArithmeticOperations::performArithmeticOperation(const Token& token, const std::string& op, double left, double right) {
+    auto it = operations.find(op);
+    if (it == operations.end()) {
+        throw std::runtime_error("Arithmetic Operation Error: Invalid Operator " + op + " at line " + std::to_string(token.line));
     }
-    else if (op == "%") {
-        if (right == 0) throw std::runtime_error("Arithmetic Operation Error: Modulo by zero at line " + line);
-        result = std::fmod(left, right);
-    }
-    else {
-        throw std::runtime_error("Arithmetic Operation Error: Invalid Operator " + op + " at line " + line);
-    }
+
+    double result = it->second(left, right);
 
     // Check if result is an integer
     if (std::floor(result) == result) {
