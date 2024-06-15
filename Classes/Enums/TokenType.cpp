@@ -30,6 +30,6 @@ std::string tokenTypeToString(TokenType type)
         case TokenType::IDENTIFIER: return "IDENTIFIER";
         case TokenType::EOL: return "EOL";
         case TokenType::EOFI: return "EOFI";
-    default: return "UNKNOWN";
+        default: return "UNKNOWN";
     }
 }
