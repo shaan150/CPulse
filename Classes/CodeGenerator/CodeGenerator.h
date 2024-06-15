@@ -1,38 +1,76 @@
 #pragma once
 #include <string>
+#include <stdexcept>
+#include <iostream>
+#include <stack>
+#include <memory>
+#include <vector>
 #include <unordered_map>
-#include <CodeGenerator/CodeGenerator.h>
 #include <Value/Value.h>
 #include <AST/AST.h>
+#include "Operation/OperationDispatcher/OperationDispatcher.h"
+#include "Operation/UnaryOperations/UnaryOperations.h"
+#include "Utility/PrintOperations.h"
 
 class FunctionHandler;
 
+/**
+ * @class CodeGenerator
+ * @brief Generates and executes code based on the AST nodes.
+ */
 class CodeGenerator {
 public:
-    // Executes the AST and outputs the result
+    /**
+     * @brief Executes the AST and outputs the result.
+     * @param root The root node of the AST.
+     */
     void execute(const ExprNode* root);
 
-    // Constructor and Destructor
+    /**
+     * @brief Constructor for the CodeGenerator class.
+     */
     CodeGenerator();
-    ~CodeGenerator();
 
+    /**
+     * @brief Destructor for the CodeGenerator class.
+     */
+    ~CodeGenerator();
 
 private:
     std::unordered_map<std::string, Value> variables;
     std::unique_ptr<FunctionHandler> functionHandler;
-    
+
+    /**
+     * @brief Executes a block of statements.
+     * @param blockNode The block node containing the statements.
+     */
     void executeBlock(const BlockNode* blockNode);
 
+    /**
+     * @brief Performs a binary operation based on the given binary expression node.
+     * @param binNode Pointer to the binary expression node.
+     * @param left The left operand value.
+     * @param right The right operand value.
+     * @return The result of the binary operation.
+     */
     Value performBinaryOperation(const BinaryExprNode* binNode, const Value& left, const Value& right);
-    Value performArithmeticOperation(const Token token, const std::string& op, const double left, const double right);
-    Value performStringOperation(const Token token, const std::string& op, const Value& left, const Value& right);
-    Value performComparisonOperation(const Token& token, const std::string& op, const Value& left, const Value& right);
-    Value performLogicalOperation(const Token token, const std::string& op, bool left, bool right);
-    Value performLogicalOperation(const Token token, const std::string& op, const Value& left, const Value& right);
+
+    /**
+     * @brief Performs a unary operation based on the given token and operand.
+     * @param token The token representing the unary operator.
+     * @param op The unary operator as a string.
+     * @param operand The operand value.
+     * @return The result of the unary operation.
+     */
     Value performUnaryOperation(const Token& token, const std::string& op, const Value& operand);
+
+    /**
+     * @brief Prints the given value to the standard output.
+     * @param value The value to be printed.
+     */
     void printValue(const Value& value);
 
-    // grant access to private members
+    // Grant access to private members
     friend Value evaluate(const ExprNode* node, CodeGenerator& generator);
     friend Value evaluateVariableNode(CodeGenerator& generator, const VariableNode* varNode);
     friend Value evaluateAssignNode(CodeGenerator& generator, const AssignNode* assignNode);
@@ -56,5 +94,4 @@ private:
     friend Value getListValue(CodeGenerator& generator, const std::string& name, const Token& token);
 
     friend class FunctionNodeEvaluator;
-
 };

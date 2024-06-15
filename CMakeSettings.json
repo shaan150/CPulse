@@ -5,7 +5,7 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "S:/Year 3/Language Design/CPulse/out/build/Debug",
+      "buildRoot": "${projectDir}out/build/Debug",
       "installRoot": "${projectDir}/out/install/${name}",
       "ctestCommandArgs": "",
       "variables": [
