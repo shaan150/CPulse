@@ -1,0 +1,25 @@
+is_running = true
+shopping_list = ""
+while (is_running == true) {
+	item = input("Please add an item to the shopping list: ")
+
+	if(item == "") {
+		is_running = false
+	}
+
+	while (item == "milk") {
+		item = input("The milk is out of stock, please select something else: ")
+	}
+	
+	if(shopping_list == "") {
+		shopping_list = item
+	} 
+
+	else {
+		if (item != "") {
+			shopping_list = shopping_list + ", " + item
+		}
+	}
+}
+
+print(shopping_list)

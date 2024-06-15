@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <iostream>
 #include <Parser/Parser.h>
-#include "classes/Lexer.h"
+#include "classes/Lexer/Lexer.h"
 #include "TokenType.h"
 
 class CPulse {

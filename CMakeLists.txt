@@ -19,20 +19,20 @@ endif()
 add_executable(CPulse
     CPulse.cpp
     CPulse.h
-    Classes/Lexer.cpp
-    Classes/Lexer.h
+    Classes/Lexer/Lexer.cpp
+    Classes/Lexer/Lexer.h
     Classes/Enums/TokenType.h
     Classes/Enums/TokenType.cpp
     Classes/Structs/Token/Token.h
-    Classes/AST.h
+    "Classes/AST/AST.h"
     "Classes/Parser/Parser.h"
     "Classes/Parser/Parser.cpp"
-    Classes/CodeGenerator.h
-    Classes/CodeGenerator.cpp # Updated extension from .CPP to .cpp for consistency
+    Classes/CodeGenerator/CodeGenerator.h
+    Classes/CodeGenerator/CodeGenerator.cpp # Updated extension from .CPP to .cpp for consistency
     
-    Classes/Structs/Maps/OperatorMap.h
-    Classes/Structs/Maps/KeywordMap.h 
-     "Classes/Structs/Maps/KeywordMap.cpp" "Classes/Structs/Maps/OperatorMap.cpp" "Classes/Structs/ValueHelper.h"       "Classes/TypedVector.cpp"  "Classes/TypedVector.h" "Classes/Value.h"   "Classes/Evaluators/Primitive/PrimitiveNodeEvaluator.h" "Classes/Evaluators/Primitive/PrimitiveNodeEvaluator.cpp" "Classes/Evaluators/Variable/VariableNodeEvaluator.cpp" "Classes/Evaluators/Variable/VariableNodeEvaluator.h" "Classes/Evaluators/List/ListNodeEvaluator.h" "Classes/Evaluators/List/ListNodeEvaluator.cpp" "Classes/Evaluators/ControlFlow/ControlFlowEvaluator.h" "Classes/Evaluators/ControlFlow/ControlFlowEvaluator.cpp" "Classes/Evaluators/Expression/ExpressionNodeEvaluator.cpp" "Classes/Evaluators/Expression/ExpressionNodeEvaluator.h" "Classes/Evaluators/IO/IONodeEvaluator.h" "Classes/Evaluators/IO/IONodeEvaluator.cpp" "Classes/Evaluator.h" "Classes/Evaluator.cpp"  "Classes/Structs/Functions/Function.h" "Classes/Structs/Functions/FunctionContext.h" "Classes/Evaluators/Function/FunctionNodeEvaluator.h" "Classes/Evaluators/Function/FunctionNodeEvaluator.cpp" "Classes/Evaluators/Handler/FunctionHandler.h" "Classes/Evaluators/Handler/FunctionHandler.cpp" "Classes/Structs/Functions/Parameter.h" "Classes/Evaluators/Function/ReturnNodeEvaluator.h" "Classes/Evaluators/Function/ReturnNodeEvaluator.cpp")
+    Classes/Structs/Map/OperatorMap.h
+    Classes/Structs/Map/KeywordMap.h 
+     "Classes/Structs/Map/KeywordMap.cpp" "Classes/Structs/Map/OperatorMap.cpp" "Classes/Structs/Value/ValueHelper.h"       "Classes/TypedVector/TypedVector.cpp"  "Classes/TypedVector/TypedVector.h" "Classes/Value/Value.h"   "Classes/CodeGenerator/Evaluator/Primitive/PrimitiveNodeEvaluator.h" "Classes/CodeGenerator/Evaluator/Primitive/PrimitiveNodeEvaluator.cpp" "Classes/CodeGenerator/Evaluator/Variable/VariableNodeEvaluator.cpp" "Classes/CodeGenerator/Evaluator/Variable/VariableNodeEvaluator.h" "Classes/CodeGenerator/Evaluator/List/ListNodeEvaluator.h" "Classes/CodeGenerator/Evaluator/List/ListNodeEvaluator.cpp" "Classes/CodeGenerator/Evaluator/ControlFlow/ControlFlowEvaluator.h" "Classes/CodeGenerator/Evaluator/ControlFlow/ControlFlowEvaluator.cpp" "Classes/CodeGenerator/Evaluator/Expression/ExpressionNodeEvaluator.cpp" "Classes/CodeGenerator/Evaluator/Expression/ExpressionNodeEvaluator.h" "Classes/CodeGenerator/Evaluator/IO/IONodeEvaluator.h" "Classes/CodeGenerator/Evaluator/IO/IONodeEvaluator.cpp" "Classes/CodeGenerator/Evaluator/Evaluator.h" "Classes/CodeGenerator/Evaluator/Evaluator.cpp"  "Classes/Function/Function.h" "Classes/Structs/Function/FunctionContext.h" "Classes/CodeGenerator/Evaluator/Function/FunctionNodeEvaluator.h" "Classes/CodeGenerator/Evaluator/Function/FunctionNodeEvaluator.cpp" "Classes/CodeGenerator/Evaluator/Handler/FunctionHandler.h" "Classes/CodeGenerator/Evaluator/Handler/FunctionHandler.cpp" "Classes/Structs/Function/Parameter.h" "Classes/CodeGenerator/Evaluator/Function/ReturnNodeEvaluator.h" "Classes/CodeGenerator/Evaluator/Function/ReturnNodeEvaluator.cpp" "Classes/Parser/Statement/StatementParser.h" "Classes/Parser/Statement/StatementParser.cpp" "Classes/Parser/Expression/ExpressionParser.h" "Classes/Parser/Expression/ExpressionParser.cpp" "Classes/Parser/Primary/PrimaryParser.h" "Classes/Parser/Primary/PrimaryParser.cpp")
 
 # Include directories
 include_directories("Classes" "Classes/Enums" "Classes/Structs")

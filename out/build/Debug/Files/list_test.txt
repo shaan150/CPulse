@@ -1,0 +1,65 @@
+is_running = true
+shopping_list = list:string()
+i = 0
+while (is_running == true) {
+	if (shopping_list.length() > 2) {
+		print("There's Too Many Items In This List, Please Remove 1 By Selecting The Number Next To The Item: ")
+		i = 0
+		while(i < shopping_list.length()) {
+			print("Item:" + i)
+			print("Item: " + shopping_list[i])
+			i = i + 1
+		}
+		itemToPop = input("Please Remove The Item: ")
+		shopping_list.pop(int(itemToPop))
+	}
+
+	item = input("Please add an item to the shopping list or press enter to quit: ")
+
+	if(item == "") {
+		is_running = false
+	}
+	
+	if(shopping_list.length() == 0) {
+		shopping_list.append(item)
+	} else {
+		if (item != "") {
+			print(shopping_list.length())
+			shopping_list.append(item)
+		}
+	}
+	i = i + 1
+	
+}
+
+print(shopping_list)
+
+is_running = true
+
+while(is_running) {
+	i = 0
+	while(i < shopping_list.length()) {
+		print("Item:" + i)
+		print("Item: " + shopping_list[i])
+		i = i + 1
+	}
+	
+	toChange = input("Would you like to change something in the list? [Type Yes Or No] ")
+	
+	if(toChange == "No") {
+		is_running = false
+	}
+
+	if(toChange != "Yes") {
+		print("Invalid Input. Looping ...")
+	} else {
+
+		index = int(input("Type The Index Of The Item In"))
+		newItem = input("Enter The New Name")
+		shopping_list.replace(index, newItem)
+		# This will error
+		shopping_list[index] = newItem + 1
+	}
+	
+	
+}

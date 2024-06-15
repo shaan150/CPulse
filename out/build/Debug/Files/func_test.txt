@@ -1,0 +1,47 @@
+is_running = true
+shopping_list = list:string()
+i = 0
+
+func:int genItems(item:int) {
+    test = item + 1
+    print("genItems generated: " + test)
+    return test
+}
+
+func:string test(item:string) {
+    item_num = genItems(1)
+    return "Processed " + item + item_num
+}
+
+while (is_running == true) {
+    if (shopping_list.length() > 2) {
+        print("There's Too Many Items In This List, Please Remove 1 By Selecting The Number Next To The Item: ")
+        i = 0
+        while (i < shopping_list.length()) {
+            print("Item: " + i)
+            print("Item: " + shopping_list[i])
+            i = i + 1
+        }
+        itemToPop = input("Please Remove The Item: ")
+        shopping_list.pop(int(itemToPop))
+    }
+
+    item = input("Please add an item to the shopping list: ")
+
+    if (item == "") {
+        is_running = false
+    }
+
+    if (shopping_list.length() == 0) {
+        shopping_list.append(item)
+    } else {
+        if (item != "") {
+            processed_item = test(item)
+            print(shopping_list.length())
+            shopping_list.append(processed_item)
+        }
+    }
+    i = i + 1
+}
+
+print(shopping_list)
