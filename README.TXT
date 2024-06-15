@@ -6,10 +6,11 @@ This guide provides an overview of the basic syntax and functionalities of your 
 Syntax and Features
 Variable Declarations
 Variables can be declared and initialized using the = operator. The type of the variable is inferred from the assigned value. Variables are implicitly typed, meaning they can change types during execution, similar to Python.
-
+```
 is_running = true
 shopping_list = list:string()
 i = 0
+```
 Global and Local Variables
 Global Variables: Any variable declared outside of a function is a global variable and can be accessed from anywhere in the program.
 Local Variables: Variables declared within a function are local to that function and cannot be accessed outside of it.
