@@ -1,0 +1,33 @@
+# Boolean Expressions with Arithmetic and Comparisons
+
+print("Printing Arithmetic and Comparisons")
+
+print((1 + 1 == 2) and (3 * 3 == 9))      # Expected output: true
+print((1 + 1 == 3) or (3 * 3 == 9))       # Expected output: true
+print((5 > 3) and (2 < 1))                # Expected output: false
+print((5 >= 5) and (2 <= 2))              # Expected output: true
+print(!(5 - 4 == 1))                      # Expected output: false
+print((5 - 4 != 1))                       # Expected output: false
+print("_________________________________________")
+
+print("Logic Flow")
+# Boolean expressions with arithmetic in control flow
+is_running = true
+while (is_running == true) {
+    number = input("Enter a number or 'exit' to quit: ")
+    if (number == "exit") {
+        is_running = false
+    } else {
+	number = double(number)
+        if (number > 0) {
+            print(string(number) + " is positive.")
+        } else {
+            if (number < 0) {
+                print(string(number) + " is negative.")
+            } else {
+                print(string(number) + " is zero. Loop will stop.")
+                is_running = false
+            }
+        }
+    }
+}

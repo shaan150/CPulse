@@ -2,9 +2,20 @@ is_running = true
 shopping_list = list:string()
 i = 0
 
+func:bool isValid(val:string, max_length:int) {
+	j = 0
+	while(j < max_length) {
+		if(val == string(j)) {
+			return true
+		}
+		j = j +1
+	}
+
+	return false
+}
+
 func:int genItems(item:int) {
     test = item + 1
-    print("genItems generated: " + test)
     return test
 }
 
@@ -13,8 +24,10 @@ func:string test(item:string) {
     return "Processed " + item + item_num
 }
 
+max_length = 2
+
 while (is_running == true) {
-    if (shopping_list.length() > 2) {
+    while (shopping_list.length() > max_length) {
         print("There's Too Many Items In This List, Please Remove 1 By Selecting The Number Next To The Item: ")
         i = 0
         while (i < shopping_list.length()) {
@@ -23,10 +36,15 @@ while (is_running == true) {
             i = i + 1
         }
         itemToPop = input("Please Remove The Item: ")
-        shopping_list.pop(int(itemToPop))
+	isValid = isValid(itemToPop, max_length)
+	if (isValid == true) {
+        	shopping_list.pop(int(itemToPop))
+	} else {
+		print("Invalid Value")
+	}
     }
 
-    item = input("Please add an item to the shopping list: ")
+    item = input("Please add an item to the shopping list or press enter to quit: ")
 
     if (item == "") {
         is_running = false
@@ -37,7 +55,6 @@ while (is_running == true) {
     } else {
         if (item != "") {
             processed_item = test(item)
-            print(shopping_list.length())
             shopping_list.append(processed_item)
         }
     }
@@ -45,3 +62,6 @@ while (is_running == true) {
 }
 
 print(shopping_list)
+
+print("Showcasing Local (Function) Variables Cannot Be Accessed")
+print(j)

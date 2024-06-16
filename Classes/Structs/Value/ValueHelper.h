@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "TypedVector/TypedVector.h"
+#include <cmath> 
 
 /**
  * @struct ValueHelper
@@ -65,17 +66,43 @@ struct ValueHelper {
         if (!isInt(value)) {
             // Check if the value is a double and try to convert it to an int
             try {
-                if (isDouble(value)) {
-                    return static_cast<int>(std::get<double>(value));
+                if (isString(value) || isDouble(value)) {
+                    double doubleValue;
+                    if (isString(value)) {
+                        // Try to convert the string to an double
+                        doubleValue = asDouble(value);
+                    }
+                    else {
+						doubleValue = asDouble(value);
+					}
+
+                    if (doubleValue != std::floor(doubleValue)) { // Check if double has a fractional part
+                        throw std::runtime_error("Value is a double with a fractional part");
+                    }
+                    return static_cast<int>(doubleValue);
+                }
+                else if (isBool(value)) {
+                    return std::get<bool>(value) ? 1 : 0;
                 }
             }
+            catch (const std::runtime_error& e) {
+				// Handle runtime_error exceptions by rethrowing them
+				throw;
+			}
             catch (const std::bad_variant_access&) {
                 // Handle bad_variant_access exceptions by throwing a runtime_error
                 throw std::runtime_error("Value is not an integer");
             }
+            catch (const std::exception& e) {
+				// Handle other standard exceptions
+				throw std::runtime_error(std::string("An error occurred: ") + e.what());
+			}
             throw std::runtime_error("Value is not an integer");
         }
-        return std::get<int>(value);
+        else {
+            // If it's already an integer, return it as is
+            return std::get<int>(value);
+        }
     }
 
     /**
@@ -85,7 +112,34 @@ struct ValueHelper {
      * @throws std::runtime_error if the value is not a double.
      */
     static double asDouble(const Value& value) {
-        if (!isDouble(value)) throw std::runtime_error("Value is not a double");
+        try {
+            // Check if the value is an integer and try to convert it to a double
+            if (!isDouble(value)) {
+                // check if it's a string and try to convert it to a double
+                if (isString(value)) {
+					return std::stod(std::get<std::string>(value));
+                }
+                else if (isInt(value)) {
+					return static_cast<double>(std::get<int>(value));
+				}
+                else if (isBool(value)) {
+					return std::get<bool>(value) ? 1.0 : 0.0;
+				}
+            }
+            else {
+                // If it's already a double, return it as is
+                return std::get<double>(value);
+            }
+        }
+        catch (const std::bad_variant_access&) {
+            // Handle bad_variant_access exceptions by throwing a runtime_error
+            throw std::runtime_error("Value is not a double or integer");
+        }
+        catch (const std::exception& e) {
+            // Handle other standard exceptions
+            throw std::runtime_error(std::string("An error occurred: ") + e.what());
+        }
+        
         return std::get<double>(value);
     }
 

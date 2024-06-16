@@ -24,7 +24,7 @@ Value evaluateReturnNode(CodeGenerator& generator, const ReturnNode* returnNode)
 
     // check if function return flag is set
     if (context.returnFlag) {
-		throw std::runtime_error("Runtime Error: Multiple return statements in function at line " + line);
+        return std::monostate();
 	}
 
     // Set the return flag

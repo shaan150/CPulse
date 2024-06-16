@@ -8,6 +8,8 @@ print(stringCatTest)
 quickMaths = quickMaths + 2
 print(quickMaths)
 print(int("5")+5)
+print(!false)
+print(true == 1)
 errorTest = 5
 errorTest = errorTest + "insert string here"
 print(errorTest)

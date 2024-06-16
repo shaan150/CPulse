@@ -26,11 +26,11 @@ Value LogicalOperations::performLogicalOperation(const Token& token, const std::
         rightBool = (std::get<std::string>(right) == "true");
     }
     else {
-        throw std::runtime_error("Logical Operation Error: Type mismatch or unsupported operation " + op + " at line " + line);
+        throw std::runtime_error("Logical Operation Error: Type mismatch or unsupported operation " + op);
     }
 
     if (op == "and") return leftBool && rightBool;
     if (op == "or") return leftBool || rightBool;
 
-    throw std::runtime_error("Logical Operation Error: Unsupported logical operator " + op + " at line " + line);
+    throw std::runtime_error("Logical Operation Error: Unsupported logical operator " + op);
 }

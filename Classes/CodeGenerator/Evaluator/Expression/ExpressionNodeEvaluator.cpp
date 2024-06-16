@@ -13,39 +13,32 @@ Value evaluateUnaryExprNode(CodeGenerator& generator, const UnaryExprNode* unNod
 
 Value evaluateTypeCastNode(CodeGenerator& generator, const TypeCastNode* typeCastNode) {
     Value value = evaluate(typeCastNode->getValue().get(), generator);
+    std::string valType = ValueHelper::type(value);
     std::string type = typeCastNode->getType();
     std::string line = std::to_string(typeCastNode->getToken().line);
-    if (type == "int") {
-        try {
-            if (ValueHelper::isDouble(value)) {
-                throw std::runtime_error("Type Cast Error: Cannot convert double to int at line " + line);
+    try {
+        if (type == "int") {
+            if (valType == "string") {
+                return ValueHelper::asInt(value);
             }
-            return std::stoi(ValueHelper::asString(value));
         }
-        catch (const std::invalid_argument&) {
-            throw std::runtime_error("Type Cast Error: Cannot convert value to int at line " + line);
+        else if (type == "double") {
+            return ValueHelper::asDouble(value);
         }
-    }
-    else if (type == "double") {
-        try {
-            return std::stod(ValueHelper::asString(value));
-        }
-        catch (const std::invalid_argument&) {
-            throw std::runtime_error("Type Cast Error: Cannot convert value to double at line " + line);
-        }
-    }
-    else if (type == "bool") {
-        try {
+        else if (type == "bool") {
             return ValueHelper::asBool(value);
         }
-        catch (const std::invalid_argument&) {
-            throw std::runtime_error("Type Cast Error: Cannot convert value to bool at line " + line);
+        else if (type == "string") {
+            return ValueHelper::asString(value);
+        }
+        else {
+            throw;
         }
     }
-    else if (type == "string") {
-        return ValueHelper::asString(value);
-    }
-    else {
-        throw std::runtime_error("Type Cast Error: Invalid type " + type + " at line " + line);
-    }
+    catch (const std::runtime_error& e) {
+		throw std::runtime_error("Type Cast Error: " + std::string(e.what()) + " at line " + line);
+	}
+    catch (const std::exception& e) {
+		throw std::runtime_error("Type Cast Error: Invalid type cast with exception " + std::string(e.what()) + " at line " + line);
+	}
 }

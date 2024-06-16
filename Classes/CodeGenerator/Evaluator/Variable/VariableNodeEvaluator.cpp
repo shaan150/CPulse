@@ -34,11 +34,9 @@ Value evaluateAssignNode(CodeGenerator& generator, const AssignNode* assignNode)
 
     if (!generator.functionHandler->currentFunctionContext.empty()) {
 		auto& context = generator.functionHandler->currentFunctionContext.top().variables;
-		auto it = context.find(name);
-        if (it != context.end()) {
-			it->second = value;
-			return value;
-		}
+        // add the variable to the current function context
+        context[name] = value;
+        return value;
 	}
 
     generator.variables[name] = value;

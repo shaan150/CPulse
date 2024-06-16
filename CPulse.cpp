@@ -41,8 +41,17 @@ void CPulse::processFile(const std::string& filePath, const std::string& title) 
 int main() {
 
     CPulse cpulse;
-    cpulse.processFile("Files/stage2_test.txt", "Test 1");
+    std::string base_path = "Files/";
+    std::string extension = ".txt";
+    int test_number = 1;
 
+   // run all tests in the Files directory with the .txt extension
+    for (const auto& entry : fs::directory_iterator(base_path)) {
+        if (entry.path().extension() == extension) {
+			cpulse.processFile(entry.path().string(), "Test " + std::to_string(test_number));
+			test_number++;
+		}
+	}
 
     return 0;
 }

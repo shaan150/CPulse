@@ -23,20 +23,17 @@ while (is_running == true) {
 	if(shopping_list.length() == 0) {
 		shopping_list.append(item)
 	} else {
-		if (item != "") {
-			print(shopping_list.length())
-			shopping_list.append(item)
-		}
+		shopping_list.append(item)
 	}
 	i = i + 1
 	
 }
 
 print(shopping_list)
-
+1+2
 is_running = true
 
-while(is_running) {
+while(is_running == true) {
 	i = 0
 	while(i < shopping_list.length()) {
 		print("Item:" + i)
@@ -57,9 +54,6 @@ while(is_running) {
 		index = int(input("Type The Index Of The Item In"))
 		newItem = input("Enter The New Name")
 		shopping_list.replace(index, newItem)
-		# This will error
-		shopping_list[index] = newItem + 1
 	}
-	
 	
 }
