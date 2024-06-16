@@ -1,0 +1,73 @@
+# Main program
+is_running = true
+
+print("Welcome to the interactive calculator!")
+print("You can enter arithmetic expressions by providing two numbers and an operator.")
+print("Type 'exit' to quit the calculator.")
+
+while (is_running == true) {
+    left = input("Enter the first number (or 'exit' to quit): ")
+    if (left == "exit") {
+        is_running = false
+    } else {
+        op = input("Enter the operator (+, -, *, /, %) (or 'exit' to quit): ")
+        if (op == "exit") {
+            is_running = false
+        } else {
+            right = input("Enter the second number (or 'exit' to quit): ")
+            if (right == "exit") {
+                is_running = false
+            } else {
+                leftValue = double(left)
+                rightValue = double(right)
+                
+                # Evaluate the expression and print the result
+                if (op == "+") {
+                    result = leftValue + rightValue
+                } else {
+                    if (op == "-") {
+                        result = leftValue - rightValue
+                    } else {
+                        if (op == "*") {
+                            result = leftValue * rightValue
+                        } else {
+                            if (op == "/") {
+                                result = leftValue / rightValue
+                            } else {
+                                if (op == "%") {
+                                    result = leftValue % rightValue
+                                } else {
+                                    print("Unsupported operator: " + op)
+                                    result = 0
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                print("Result: " + result)
+            }
+        }
+    }
+}
+
+print("Thank you for using the interactive calculator!")
+
+print("Regular Equations")
+# Expression: 1 - 2
+# Answer: -1
+print(1 - 2)
+
+# Expression: 2.5 + 2.5 - 1.25
+# Answer: 3.75
+print(2.5 + 2.5 - 1.25)
+
+# Expression: 10 * (2 + 6)
+# Answer: 80
+print(10 * (2 + 6))
+
+print(10 * 2 + 6)
+
+# Expression: 8.5 / (2 * 9) - -3
+# Answer: 3.4722222222222223 (or 3.47 if rounded to 2 decimal places)
+print(8.5 / (2 * 9) - -3)

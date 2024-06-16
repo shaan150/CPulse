@@ -44,6 +44,11 @@ int main() {
     std::string base_path = "Files/";
     std::string extension = ".txt";
     int test_number = 1;
+    // check if the directory exists
+    if (!fs::exists(base_path)) {
+		std::cerr << "Directory does not exist: " << base_path << std::endl;
+		return 1;
+	}
 
    // run all tests in the Files directory with the .txt extension
     for (const auto& entry : fs::directory_iterator(base_path)) {

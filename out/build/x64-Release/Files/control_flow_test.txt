@@ -1,0 +1,36 @@
+# Boolean Expressions and Control Flow
+
+print("Boolean comparison and logical operations")
+# Boolean comparison and logical operations
+print(true == false)       # Expected output: false
+print(true != false)       # Expected output: true
+print(5 < 10)              # Expected output: true
+print(2.0 == 2)            # Expected output: true
+print(!(5 - 4 > 3 * 2 == !false))  # Expected output: true
+print(true and true)       # Expected output: true
+print(false and true)      # Expected output: false
+print((0 < 1) or false)    # Expected output: true
+print(false or false)      # Expected output: false
+print("_________________________________________")
+
+print("Logic Flow")
+# Using boolean expressions in control flow
+is_running = true
+while (is_running == true) {
+    condition = input("Enter a boolean condition (true/false) or 'exit' to quit: ")
+    
+    if (condition == "exit") {
+        is_running = false
+    } else {
+        if (condition == "true") {
+            print("You entered true. Loop will continue.")
+        } else {
+            if (condition == "false") {
+                print("You entered false. Loop will stop.")
+                is_running = false
+            } else {
+                print("Invalid input. Loop will continue.")
+            }
+        }
+    }
+}

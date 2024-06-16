@@ -93,6 +93,10 @@ struct ValueHelper {
                 // Handle bad_variant_access exceptions by throwing a runtime_error
                 throw std::runtime_error("Value is not an integer");
             }
+            // error fomr std::stoi
+            catch (const std::invalid_argument& e) {
+                throw std::runtime_error("Value is not an integer");
+            }
             catch (const std::exception& e) {
 				// Handle other standard exceptions
 				throw std::runtime_error(std::string("An error occurred: ") + e.what());
@@ -134,6 +138,9 @@ struct ValueHelper {
         catch (const std::bad_variant_access&) {
             // Handle bad_variant_access exceptions by throwing a runtime_error
             throw std::runtime_error("Value is not a double or integer");
+        }
+        catch (const std::invalid_argument& e) {
+            throw std::runtime_error("Value is not an double or integer");
         }
         catch (const std::exception& e) {
             // Handle other standard exceptions
