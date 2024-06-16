@@ -72,6 +72,8 @@ private:
      */
     static std::unique_ptr<BlockNode> parse_function_body(Parser& parser, bool& hasReturnStatement);
 
+    static void check_arguments(const std::vector<std::unique_ptr<ExprNode>>& args, int expectedArgs, std::string functionName, Token& token);
+
     /**
      * @brief Handles the parsing of an assignment operation.
      * @param parser The parser to use for parsing the assignment.

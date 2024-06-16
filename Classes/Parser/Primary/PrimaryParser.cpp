@@ -161,16 +161,19 @@ std::unique_ptr<ExprNode> PrimaryParser::handle_functions(Parser& parser, std::s
             }
         }
         parser.expect(TokenType::RPARENTHESIS);
-
         if (identifier == "print") {
+            check_arguments(args, 1, identifier, token);
+
             return std::make_unique<PrintNode>(token, std::move(args[0])); // Assuming print takes only one argument
         }
         else if (identifier == "input") {
             // create a print node to print the value
+            check_arguments(args, 1, identifier, token);
             auto printNode = std::make_unique<PrintNode>(token, std::move(args[0])); // Assuming input takes only one argument
             return std::make_unique<InputNode>(token, std::move(printNode));
         }
         else if (identifier == "int" || identifier == "double" || identifier == "string" || identifier == "bool") {
+            check_arguments(args, 1, identifier, token);
             return std::make_unique<TypeCastNode>(token, identifier, std::move(args[0])); // Assuming type casts take only one argument
         }
         return std::make_unique<FunctionCallNode>(token, identifier, std::move(args));
@@ -249,4 +252,15 @@ std::unique_ptr<BlockNode> PrimaryParser::parse_function_body(Parser& parser, bo
     parser.expect(TokenType::RBRACE);
     Token blockToken = parser.current_token();
     return std::make_unique<BlockNode>(blockToken, std::move(statements));
+}
+
+// argument error if arguments are missing are not equal 
+void PrimaryParser::check_arguments(const std::vector<std::unique_ptr<ExprNode>>& args, int expectedArgs, std::string functionName, Token& token) {
+    std::string line = std::to_string(token.line);
+    if (args.empty()) {
+        throw std::runtime_error("Syntax Error: Missing Argument For " + functionName + " Function at line " + line);
+    }
+    if (args.size() != expectedArgs) {
+		throw std::runtime_error("Syntax Error: Expected " + std::to_string(expectedArgs) + " Arguments For " + functionName + " Function at line " + line);
+	}
 }

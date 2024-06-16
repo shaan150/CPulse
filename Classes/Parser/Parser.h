@@ -50,6 +50,8 @@ private:
      */
     void expect(TokenType type);
 
+    void expectEOL();
+
     friend class StatementParser;
     friend class ExpressionParser;
     friend class PrimaryParser;

@@ -29,7 +29,7 @@ std::unique_ptr<ExprNode> StatementParser::parse_statement(Parser& parser) {
     }
     else {
         auto expr = ExpressionParser::parse_expression(parser);
-        parser.expect(TokenType::EOL);
+        parser.expectEOL();
         return expr;
     }
 }
@@ -38,7 +38,7 @@ std::unique_ptr<ExprNode> StatementParser::parse_return_statement(Parser& parser
     Token returnToken = parser.current_token(); // This should be the 'return' token
     parser.advance();
     auto value = ExpressionParser::parse_expression(parser); // Assuming you have a parse_expression function
-    parser.expect(TokenType::EOL);
+    parser.expectEOL();
     return std::make_unique<ReturnNode>(returnToken, std::move(value));
 }
 
@@ -48,7 +48,9 @@ std::unique_ptr<ExprNode> StatementParser::parse_print_statement(Parser& parser)
     parser.expect(TokenType::LPARENTHESIS);
     auto expr = ExpressionParser::parse_expression(parser);
     parser.expect(TokenType::RPARENTHESIS);
-    parser.expect(TokenType::EOL);
+    // check if it's the end of the line or eofi
+    parser.expectEOL();
+
     return std::make_unique<PrintNode>(printToken, std::move(expr));
 }
 
@@ -81,6 +83,11 @@ std::unique_ptr<ExprNode> StatementParser::parse_while_statement(Parser& parser)
     parser.advance(); // Move past 'while'
     parser.expect(TokenType::LPARENTHESIS);
     auto condition = ExpressionParser::parse_expression(parser);
+    // make sure the condition is a boolean expression 
+    TokenType conditionType = condition->getToken().type;
+    if (condition->getToken().type != TokenType::COMPARISON && conditionType != TokenType::LOGICAL) {
+		throw std::runtime_error("Syntax Error: Expected a boolean expression in the while loop condition");
+	}
     parser.expect(TokenType::RPARENTHESIS);
     parser.expect(TokenType::LBRACE);
     auto block = parse_statements_block(parser);

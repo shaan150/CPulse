@@ -16,8 +16,8 @@ void Parser::advance() {
 }
 
 void Parser::expect(TokenType type) {
-    if (current_token().type == TokenType::EOFI) {
-        return;
+    if (current_token().type == TokenType::EOFI && type != TokenType::EOFI) {
+        throw std::runtime_error("Syntax Error: Unexpected End Of File");
     }
 
     while (current_token().type == TokenType::EOL && type != TokenType::EOL) {
@@ -34,6 +34,17 @@ void Parser::expect(TokenType type) {
             "\nExpected Type: " + tokenTypeToString(type));
     }
     advance();
+}
+
+void Parser::expectEOL() {
+    try {
+        expect(TokenType::EOL);
+    }
+    catch (const std::runtime_error& e) {
+        if (current_token().type != TokenType::EOFI) {
+            throw;
+        }
+    }
 }
 
 std::unique_ptr<ASTNode> Parser::parse() {
